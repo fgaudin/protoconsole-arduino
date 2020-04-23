@@ -40,7 +40,6 @@ void listen()
       //debug("command out of range");
     }
   }
-  delay(1000);
 }
 
 void loop()

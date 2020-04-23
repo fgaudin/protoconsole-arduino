@@ -7,7 +7,13 @@ Controller::Controller() {
   this->handlers[1] = &Controller::handle_hello;
   this->handlers[2] = nullptr;
   this->handlers[64] = &Controller::handle_flags1;
+  this->handlers[70] = &Controller::handle_twr;
+  this->handlers[71] = &Controller::handle_pitch;
   this->handlers[192] = &Controller::handle_periapsis;
+  this->handlers[193] = &Controller::handle_apoapsis;
+  this->handlers[194] = &Controller::handle_altitude;
+  this->handlers[195] = &Controller::handle_vertical_velocity;
+  this->handlers[196] = &Controller::handle_horizontal_velocity;
 
   this->connected = false;
 }
@@ -40,7 +46,7 @@ void Controller::handle_hello(byte* value)
 
 void Controller::handle_flags1(byte* value)
 {
-  this->telemetry.solar_panel = bitRead(value[0], 0);
+  this->telemetry.solarPanel = bitRead(value[0], 0);
   this->telemetry.gear = bitRead(value[0], 1);
   this->telemetry.docked = bitRead(value[0], 2);
   this->telemetry.lights = bitRead(value[0], 3);
@@ -50,7 +56,37 @@ void Controller::handle_flags1(byte* value)
   this->telemetry.antenna = bitRead(value[0], 7);
 }
 
+void Controller::handle_twr(byte* value)
+{
+  this->telemetry.twr = * (byte *) value;
+}
+
+void Controller::handle_pitch(byte* value)
+{
+  this->telemetry.pitch = * (byte *) value;
+}
+
 void Controller::handle_periapsis(byte* value)
 {
   this->telemetry.periapsis = * (long *) value;
+}
+
+void Controller::handle_apoapsis(byte* value)
+{
+  this->telemetry.apoapsis = * (long *) value;
+}
+
+void Controller::handle_vertical_velocity(byte* value)
+{
+  this->telemetry.verticalVelocity = * (long *) value;
+}
+
+void Controller::handle_horizontal_velocity(byte* value)
+{
+  this->telemetry.horizontalVelocity = * (long *) value;
+}
+
+void Controller::handle_altitude(byte* value)
+{
+  this->telemetry.altitude = * (long *) value;
 }

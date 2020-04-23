@@ -1,4 +1,5 @@
 #include "MainDisplay.h"
+#include <Utils.h>
 
 MainDisplay::MainDisplay() : lcd(0x27)
 {
@@ -18,25 +19,47 @@ void MainDisplay::init(Telemetry* telemetry)
 void MainDisplay::setMode(DisplayMode mode)
 {
     this->mode = mode;
+    this->lcd.clear();
+
+    if (this->mode == debug) {
+        this->lcd.home();
+    } else if (this->mode == ascent) {
+        int i = 0;
+        this->lcd.setCursor(0, i++);
+        this->lcd.print("Ap:0000000");
+        this->lcd.setCursor(0, i++);
+        this->lcd.print("Pe:0000000");
+        this->lcd.setCursor(0, i++);
+        this->lcd.print("vVel:00000");
+        this->lcd.setCursor(0, i++);
+        this->lcd.print("hVel:00000");
+        i = 0;
+        this->lcd.setCursor(11, i++);
+        this->lcd.print("Alt:00000");
+        this->lcd.setCursor(11, i++);
+        this->lcd.print("TWR:00000");
+        this->lcd.setCursor(11, i++);
+        this->lcd.print("Pitch:000");
+    }
 }
 
 void MainDisplay::refresh()
 {
-    char row[20];
     if (this->mode == debug) {
-        this->lcd.clear();
         this->lcd.home();
         this->lcd.print(this->debug_str);
     } else if (this->mode == ascent) {
-        this->lcd.clear();
-        this->lcd.setCursor(0, 0);
-        this->lcd.print("Pe:");
-        ltoa(this->telemetry->periapsis, row, 10);
-        this->lcd.print(row);
-        this->lcd.setCursor(0, 1);
-        this->lcd.print("Ap:");
-        ltoa(this->telemetry->apoapsis, row, 10);
-        this->lcd.print(row);
+        char data[8];
+
+        this->lcd.setCursor(3, 0);
+        ltoa(this->telemetry->apoapsis, data, 10);
+        padRight(' ', data, sizeof(data) - 1);
+        this->lcd.print(data);
+
+        this->lcd.setCursor(3, 1);
+        ltoa(this->telemetry->periapsis, data, 10);
+        padRight(' ', data, sizeof(data) - 1);
+        this->lcd.print(data);
     }
 }
 

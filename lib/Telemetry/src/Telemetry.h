@@ -4,7 +4,7 @@
 
 class Telemetry {
     public:
-        bool solar_panel;
+        bool solarPanel;
         bool gear;
         bool docked;
         bool lights;
@@ -14,10 +14,14 @@ class Telemetry {
         bool engine;
         bool antenna;
 
+        byte twr;
+        byte pitch;
+
+        long altitude;
         long periapsis;
         long apoapsis;
-        long surface_velocity;
-        long orbital_velocity;
+        long verticalVelocity;
+        long horizontalVelocity;
 
         Telemetry();
 };

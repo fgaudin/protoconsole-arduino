@@ -21,7 +21,13 @@ class Controller {
         void init();
         void update();
         void handle_command(byte command, byte* value);
-        void handle_hello(byte* value);  // HELLO
-        void handle_flags1(byte* value);  // FLAGS1
+        void handle_hello(byte* value);
+        void handle_flags1(byte* value);
+        void handle_pitch(byte* value);
+        void handle_twr(byte* value);
         void handle_periapsis(byte* value);
+        void handle_apoapsis(byte* value);
+        void handle_vertical_velocity(byte* value);
+        void handle_horizontal_velocity(byte* value);
+        void handle_altitude(byte* value);
 };
