@@ -1,20 +1,14 @@
 #include <Arduino.h>
 #include <Controller.h>
-#include <MainDisplay.h>
 
 
 bool connected = false;
-Controller *controller;
-MainDisplay *main_display;
+Controller controller;
 
 void setup()
 {
   Serial.begin(115200);
-  main_display->init(controller);
-  strcpy(controller->debug_str, "Started");
-  main_display->print(controller->debug_str);
-  main_display->refresh();
-  delay(2000);
+  controller.init();
 }
 
 void hello()
@@ -41,22 +35,21 @@ void listen()
     int read = Serial.readBytes(value, value_size);
 
     if (cmd > 0 && cmd < 256) {
-      controller->handle_command(cmd, value);
+      controller.handle_command(cmd, value);
     } else {
       //debug("command out of range");
     }
   }
-  main_display->print("refreshing");
   delay(1000);
-  main_display->refresh();
 }
 
 void loop()
 {
-  if (!controller->connected) {
+  if (!controller.connected) {
     hello();
     delay(200);
   }
   
   listen();
+  controller.update();
 }

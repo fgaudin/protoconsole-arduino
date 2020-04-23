@@ -1,19 +1,18 @@
 #include "MainDisplay.h"
 
-LiquidCrystal_PCF8574 lcd(0x27);
-
-MainDisplay::MainDisplay()
+MainDisplay::MainDisplay() : lcd(0x27)
 {
     this->mode = debug;
 }
 
-void MainDisplay::init(Controller* controller)
+void MainDisplay::init(Telemetry* telemetry)
 {
-    this->controller = controller;
-    lcd.begin(20, 4); // initialize the lcd
-    lcd.setBacklight(255);
-    lcd.home();
-    lcd.clear();
+    this->telemetry = telemetry;
+    this->lcd.begin(20, 4);
+    this->lcd.setBacklight(255);
+    this->lcd.home();
+    this->lcd.clear();
+    this->lcd.print("Display initialized");
 }
 
 void MainDisplay::setMode(DisplayMode mode)
@@ -24,24 +23,24 @@ void MainDisplay::setMode(DisplayMode mode)
 void MainDisplay::refresh()
 {
     char row[20];
-    if (this->mode == ascent) {
-        lcd.clear();
-        lcd.home();
-        lcd.print(this->controller->debug_str);
+    if (this->mode == debug) {
+        this->lcd.clear();
+        this->lcd.home();
+        this->lcd.print(this->debug_str);
     } else if (this->mode == ascent) {
-        lcd.clear();
-        lcd.setCursor(0, 0);
-        lcd.print("Pe:");
-        ltoa(this->controller->periapsis, row, 10);
-        lcd.print(row);
-        lcd.setCursor(0, 1);
-        lcd.print("Ap:");
-        ltoa(this->controller->apoapsis, row, 10);
-        lcd.print(row);
+        this->lcd.clear();
+        this->lcd.setCursor(0, 0);
+        this->lcd.print("Pe:");
+        ltoa(this->telemetry->periapsis, row, 10);
+        this->lcd.print(row);
+        this->lcd.setCursor(0, 1);
+        this->lcd.print("Ap:");
+        ltoa(this->telemetry->apoapsis, row, 10);
+        this->lcd.print(row);
     }
 }
 
 void MainDisplay::print(const char* str)
 {
-    lcd.print(str);
+    this->lcd.print(str);
 }
