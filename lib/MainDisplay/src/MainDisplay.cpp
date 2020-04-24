@@ -30,9 +30,9 @@ void MainDisplay::setMode(DisplayMode mode)
         this->lcd.setCursor(0, i++);
         this->lcd.print("Pe:0000000");
         this->lcd.setCursor(0, i++);
-        this->lcd.print("vVel:00000");
+        this->lcd.print("VSp:000000");
         this->lcd.setCursor(0, i++);
-        this->lcd.print("hVel:00000");
+        this->lcd.print("HSp:000000");
         i = 0;
         this->lcd.setCursor(11, i++);
         this->lcd.print("Alt:00000");
@@ -52,13 +52,43 @@ void MainDisplay::refresh()
         char data[8];
 
         this->lcd.setCursor(3, 0);
-        ltoa(this->telemetry->apoapsis, data, 10);
-        padRight(' ', data, sizeof(data) - 1);
+        metricfy(this->telemetry->apoapsis, data);
+        padRight(' ', data, 7);
         this->lcd.print(data);
 
+        memset(data, 0, 8);
         this->lcd.setCursor(3, 1);
-        ltoa(this->telemetry->periapsis, data, 10);
-        padRight(' ', data, sizeof(data) - 1);
+        metricfy(this->telemetry->periapsis, data);
+        padRight(' ', data, 7);
+        this->lcd.print(data);
+
+        memset(data, 0, 8);
+        this->lcd.setCursor(4, 2);
+        metricfy(this->telemetry->verticalSpeed , data);
+        padRight(' ', data, 6);
+        this->lcd.print(data);
+
+        memset(data, 0, 8);
+        this->lcd.setCursor(4, 3);
+        metricfy(this->telemetry->horizontalSpeed , data);
+        padRight(' ', data, 6);
+        this->lcd.print(data);
+
+        memset(data, 0, 8);
+        this->lcd.setCursor(15, 0);
+        metricfy(this->telemetry->altitude, data);
+        padRight(' ', data, 5);
+        this->lcd.print(data);
+
+        memset(data, 0, 8);
+        this->lcd.setCursor(15, 1);
+        dtostrf(this->telemetry->twr, 5, 1, data);
+        this->lcd.print(data);
+
+        memset(data, 0, 8);
+        this->lcd.setCursor(17, 2);
+        ltoa(this->telemetry->pitch, data, 10);
+        padRight(' ', data, 3);
         this->lcd.print(data);
     }
 }

@@ -14,14 +14,14 @@ class Telemetry {
         bool engine;
         bool antenna;
 
-        byte twr;
+        float twr;
         byte pitch;
 
         long altitude;
         long periapsis;
         long apoapsis;
-        long verticalVelocity;
-        long horizontalVelocity;
+        long verticalSpeed;
+        long horizontalSpeed;
 
         Telemetry();
 };

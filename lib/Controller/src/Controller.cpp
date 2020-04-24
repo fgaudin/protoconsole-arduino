@@ -12,8 +12,8 @@ Controller::Controller() {
   this->handlers[192] = &Controller::handle_periapsis;
   this->handlers[193] = &Controller::handle_apoapsis;
   this->handlers[194] = &Controller::handle_altitude;
-  this->handlers[195] = &Controller::handle_vertical_velocity;
-  this->handlers[196] = &Controller::handle_horizontal_velocity;
+  this->handlers[195] = &Controller::handle_vertical_speed;
+  this->handlers[196] = &Controller::handle_horizontal_speed;
 
   this->connected = false;
 }
@@ -58,7 +58,7 @@ void Controller::handle_flags1(byte* value)
 
 void Controller::handle_twr(byte* value)
 {
-  this->telemetry.twr = * (byte *) value;
+  this->telemetry.twr = float(* (byte *) value) / 10;
 }
 
 void Controller::handle_pitch(byte* value)
@@ -76,14 +76,14 @@ void Controller::handle_apoapsis(byte* value)
   this->telemetry.apoapsis = * (long *) value;
 }
 
-void Controller::handle_vertical_velocity(byte* value)
+void Controller::handle_vertical_speed(byte* value)
 {
-  this->telemetry.verticalVelocity = * (long *) value;
+  this->telemetry.verticalSpeed = * (long *) value;
 }
 
-void Controller::handle_horizontal_velocity(byte* value)
+void Controller::handle_horizontal_speed(byte* value)
 {
-  this->telemetry.horizontalVelocity = * (long *) value;
+  this->telemetry.horizontalSpeed = * (long *) value;
 }
 
 void Controller::handle_altitude(byte* value)

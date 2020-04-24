@@ -27,7 +27,7 @@ class Controller {
         void handle_twr(byte* value);
         void handle_periapsis(byte* value);
         void handle_apoapsis(byte* value);
-        void handle_vertical_velocity(byte* value);
-        void handle_horizontal_velocity(byte* value);
+        void handle_vertical_speed(byte* value);
+        void handle_horizontal_speed(byte* value);
         void handle_altitude(byte* value);
 };
