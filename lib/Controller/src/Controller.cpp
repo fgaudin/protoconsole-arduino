@@ -2,7 +2,12 @@
 
 #define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
 
+const unsigned long refreshPeriod = 100000; // 100 ms
+const int pinAscentMode = 2;
+const int pinDebugMode = 3;
+
 Controller::Controller() {
+  this->lastUpdate = micros();
   this->handlers[0] = nullptr;
   this->handlers[1] = &Controller::handle_hello;
   this->handlers[2] = nullptr;
@@ -20,14 +25,31 @@ Controller::Controller() {
 
 void Controller::init()
 {
+  pinMode(pinAscentMode, INPUT_PULLUP);
+  pinMode(pinDebugMode, INPUT_PULLUP);
   this->display.init(&this->telemetry);
   strcpy(this->display.debug_str, "controller ready");
   this->display.setMode(ascent);
 }
 
+void Controller::checkInputs()
+{
+  if(!digitalRead(pinAscentMode)) {
+    this->display.setMode(ascent);
+  }
+  if(!digitalRead(pinDebugMode)) {
+    this->display.setMode(debug);
+  }
+}
+
 void Controller::update()
 {
-  this->display.refresh();
+  unsigned long now = micros();
+  this->checkInputs();
+  if (now - this->lastUpdate > refreshPeriod) {
+    this->display.refresh();
+    this->lastUpdate = now;
+  }
 }
 
 void Controller::handle_command(byte command, byte* value)

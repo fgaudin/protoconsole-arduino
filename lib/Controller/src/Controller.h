@@ -11,14 +11,17 @@ typedef void (Controller::*Handler)(byte*);
 
 class Controller {
     private:
+        unsigned long lastUpdate;
         Handler handlers[256];
         Telemetry telemetry;
         MainDisplay display;
+
     public:
         bool connected;
         
         Controller();
         void init();
+        void checkInputs();
         void update();
         void handle_command(byte command, byte* value);
         void handle_hello(byte* value);
