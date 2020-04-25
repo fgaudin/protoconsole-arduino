@@ -15,7 +15,7 @@ class Telemetry {
         bool antenna;
 
         float twr;
-        byte pitch;
+        int pitch;
 
         long altitude;
         long periapsis;

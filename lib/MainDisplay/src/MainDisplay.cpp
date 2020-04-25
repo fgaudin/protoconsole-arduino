@@ -18,28 +18,36 @@ void MainDisplay::init(Telemetry* telemetry)
 
 void MainDisplay::setMode(DisplayMode mode)
 {
+    char leftArrow = 127;
+    char rightArrow = 126;
     this->mode = mode;
     this->lcd.clear();
 
     if (this->mode == debug) {
+        this->lcd.setCursor(19, 3);
+        this->lcd.print(rightArrow);
         this->lcd.home();
     } else if (this->mode == ascent) {
-        int i = 0;
-        this->lcd.setCursor(0, i++);
-        this->lcd.print("Ap:0000000");
-        this->lcd.setCursor(0, i++);
-        this->lcd.print("Pe:0000000");
-        this->lcd.setCursor(0, i++);
-        this->lcd.print("VSp:000000");
-        this->lcd.setCursor(0, i++);
-        this->lcd.print("HSp:000000");
-        i = 0;
-        this->lcd.setCursor(11, i++);
+        this->lcd.setCursor(0, 0);
+        this->lcd.print(leftArrow);
+        int row = 0;
+        int colLeft = 1;
+        int colRight = 10;
+        this->lcd.setCursor(colLeft, row++);
+        this->lcd.print("Ap:00000");
+        this->lcd.setCursor(colLeft, row++);
+        this->lcd.print("Pe:00000");
+        this->lcd.setCursor(colLeft, row++);
+        this->lcd.print("Vs:00000");
+        this->lcd.setCursor(colLeft, row++);
+        this->lcd.print("Hs:00000");
+        row = 0;
+        this->lcd.setCursor(colRight, row++);
         this->lcd.print("Alt:00000");
-        this->lcd.setCursor(11, i++);
+        this->lcd.setCursor(colRight, row++);
         this->lcd.print("TWR:00000");
-        this->lcd.setCursor(11, i++);
-        this->lcd.print("Pitch:000");
+        this->lcd.setCursor(colRight, row++);
+        this->lcd.print("Pch:0000");
     }
 }
 
@@ -49,46 +57,50 @@ void MainDisplay::refresh()
         this->lcd.home();
         this->lcd.print(this->debug_str);
     } else if (this->mode == ascent) {
+        int colLeft = 1;
+        int colRight = 10;
+        
         char data[8];
 
-        this->lcd.setCursor(3, 0);
+        memset(data, 0, 8);
+        this->lcd.setCursor(colLeft+3, 0);
         metricfy(this->telemetry->apoapsis, data);
-        padRight(' ', data, 7);
+        padLeft(' ', data, 5);
         this->lcd.print(data);
 
         memset(data, 0, 8);
-        this->lcd.setCursor(3, 1);
+        this->lcd.setCursor(colLeft+3, 1);
         metricfy(this->telemetry->periapsis, data);
-        padRight(' ', data, 7);
+        padLeft(' ', data, 5);
         this->lcd.print(data);
 
         memset(data, 0, 8);
-        this->lcd.setCursor(4, 2);
+        this->lcd.setCursor(colLeft+3, 2);
         metricfy(this->telemetry->verticalSpeed , data);
-        padRight(' ', data, 6);
+        padLeft(' ', data, 5);
         this->lcd.print(data);
 
         memset(data, 0, 8);
-        this->lcd.setCursor(4, 3);
+        this->lcd.setCursor(colLeft+3, 3);
         metricfy(this->telemetry->horizontalSpeed , data);
-        padRight(' ', data, 6);
+        padLeft(' ', data, 5);
         this->lcd.print(data);
 
         memset(data, 0, 8);
-        this->lcd.setCursor(15, 0);
+        this->lcd.setCursor(colRight+4, 0);
         metricfy(this->telemetry->altitude, data);
-        padRight(' ', data, 5);
+        padLeft(' ', data, 5);
         this->lcd.print(data);
 
         memset(data, 0, 8);
-        this->lcd.setCursor(15, 1);
+        this->lcd.setCursor(colRight+4, 1);
         dtostrf(this->telemetry->twr, 5, 1, data);
         this->lcd.print(data);
 
         memset(data, 0, 8);
-        this->lcd.setCursor(17, 2);
+        this->lcd.setCursor(colRight+4, 2);
         ltoa(this->telemetry->pitch, data, 10);
-        padRight(' ', data, 3);
+        padLeft(' ', data, 5);
         this->lcd.print(data);
     }
 }

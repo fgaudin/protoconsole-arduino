@@ -11,6 +11,19 @@ void padRight(char padChar, char * str, int max)
     }
 }
 
+void padLeft(char padChar, char * str, int max)
+{
+    int strLen = strlen(str);
+    int padding = max - strLen;
+    if (padding > 0) {
+        for (int i=strLen - 1; i>=0; i--){
+            str[i+padding] = str[i];
+        }
+        memset(str, padChar, padding);
+        str[max] = '\0';
+    }
+}
+
 void metricfy(long value, char * buffer)
 {
     char unit = ' ';

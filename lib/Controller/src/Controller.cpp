@@ -63,7 +63,7 @@ void Controller::handle_twr(byte* value)
 
 void Controller::handle_pitch(byte* value)
 {
-  this->telemetry.pitch = * (byte *) value;
+  this->telemetry.pitch =(int) * (signed char *) value;
 }
 
 void Controller::handle_periapsis(byte* value)
