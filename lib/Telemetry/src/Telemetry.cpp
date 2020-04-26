@@ -13,6 +13,7 @@ Telemetry::Telemetry() {
 
   this->twr = 0.0;
   this->pitch = 0;
+  this->stageFuel = 0;
 
   this->altitude = 0.0;
   this->periapsis = 0.0;

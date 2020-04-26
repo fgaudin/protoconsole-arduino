@@ -5,6 +5,9 @@
 const unsigned long refreshPeriod = 100000; // 100 ms
 const int pinAscentMode = 2;
 const int pinDebugMode = 3;
+const int pinFuelSerial = 4;
+const int pinFuelLatch = 5;
+const int pinFuelClock = 6;
 
 Controller::Controller() {
   this->lastUpdate = micros();
@@ -14,6 +17,7 @@ Controller::Controller() {
   this->handlers[64] = &Controller::handle_flags1;
   this->handlers[70] = &Controller::handle_twr;
   this->handlers[71] = &Controller::handle_pitch;
+  this->handlers[72] = &Controller::handleStageFuel;
   this->handlers[192] = &Controller::handle_periapsis;
   this->handlers[193] = &Controller::handle_apoapsis;
   this->handlers[194] = &Controller::handle_altitude;
@@ -30,6 +34,9 @@ void Controller::init()
   this->display.init(&this->telemetry);
   strcpy(this->display.debug_str, "controller ready");
   this->display.setMode(ascent);
+
+  this->fuel.init(pinFuelSerial, pinFuelLatch, pinFuelClock);
+  this->fuel.setSource(&this->telemetry.stageFuel);
 }
 
 void Controller::checkInputs()
@@ -48,6 +55,7 @@ void Controller::update()
   this->checkInputs();
   if (now - this->lastUpdate > refreshPeriod) {
     this->display.refresh();
+    this->fuel.refresh();
     this->lastUpdate = now;
   }
 }
@@ -82,6 +90,12 @@ void Controller::handle_twr(byte* value)
 {
   this->telemetry.twr = float(* (byte *) value) / 10;
 }
+
+void Controller::handleStageFuel(byte* value)
+{
+  this->telemetry.stageFuel =(int) * (byte *) value;
+}
+
 
 void Controller::handle_pitch(byte* value)
 {

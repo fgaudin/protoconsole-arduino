@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include <Telemetry.h>
 #include <MainDisplay.h>
+#include <BarGraph.h>
 
 
 class Controller;
@@ -15,6 +16,7 @@ class Controller {
         Handler handlers[256];
         Telemetry telemetry;
         MainDisplay display;
+        BarGraph fuel;
 
     public:
         bool connected;
@@ -28,6 +30,7 @@ class Controller {
         void handle_flags1(byte* value);
         void handle_pitch(byte* value);
         void handle_twr(byte* value);
+        void handleStageFuel(byte* value);
         void handle_periapsis(byte* value);
         void handle_apoapsis(byte* value);
         void handle_vertical_speed(byte* value);
