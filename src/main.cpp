@@ -42,7 +42,7 @@ void listen()
   }
 }
 
-void loop()
+void normal_loop()
 {
   if (!controller.connected) {
     hello();
@@ -51,4 +51,8 @@ void loop()
   
   listen();
   controller.update();
+}
+
+void loop() {
+  normal_loop();
 }

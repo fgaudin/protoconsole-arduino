@@ -17,6 +17,10 @@ class Telemetry {
         float twr;
         int pitch;
         int stageFuel;
+        int stageOx;
+        int stageMonoprop;
+        int stageElec;
+        int stageXenon;
 
         long altitude;
         long periapsis;

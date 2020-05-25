@@ -1,38 +1,43 @@
 #include "BarGraph.h"
 
-BarGraph::BarGraph()
+BarGraph::BarGraph() : 
+    ledCtrl(8, 9, 10, 1),
+    addr{
+        {{6,7},{5,7},{0,7},{0,6},{0,5},{0,4},{0,3},{0,2},{0,1},{0,0}},
+        {{6,6},{5,6},{1,7},{1,6},{1,5},{1,4},{1,3},{1,2},{1,1},{1,0}},
+        {{6,5},{5,5},{2,7},{2,6},{2,5},{2,4},{2,3},{2,2},{2,1},{2,0}},
+        {{6,4},{5,4},{3,7},{3,6},{3,5},{3,4},{3,3},{3,2},{3,1},{3,0}},
+        {{6,3},{5,3},{4,7},{4,6},{4,5},{4,4},{4,3},{4,2},{4,1},{4,0}}
+    }
 {
-    this->displayValue = 0;
+
 }
 
-void BarGraph::init(int  pinSerial, int pinLatch, int pinClock)
+void BarGraph::init(int  pinData, int pinClock, int pinLoad, Telemetry* telemetry)
 {
-    this->pinSerial = pinSerial;
-    this->pinLatch = pinLatch;
+    this->pinData = pinData;
     this->pinClock = pinClock;
-    pinMode(pinSerial, OUTPUT);
-    pinMode(pinLatch, OUTPUT);
+    this->pinLoad = pinLoad;
+    pinMode(pinData, OUTPUT);
     pinMode(pinClock, OUTPUT);
-}
+    pinMode(pinLoad, OUTPUT);
+    this->telemetry = telemetry;
 
-void BarGraph::setSource(int* telemetryData)
-{
-    this->telemetryData = telemetryData;
+    this->ledCtrl.shutdown(0,false);
+    this->ledCtrl.setIntensity(0,15);
 }
 
 void BarGraph::refresh()
 {
-    long value = round(*this->telemetryData/10.0);
-    digitalWrite(this->pinLatch, LOW);
-    digitalWrite(this->pinSerial, HIGH);
-    for (int i=0; i<value; i++) {
-        digitalWrite(this->pinClock, LOW);
-        digitalWrite(this->pinClock, HIGH);
+    this->bar[0] = this->telemetry->stageFuel;
+    this->bar[1] = this->telemetry->stageOx;
+    this->bar[2] = this->telemetry->stageMonoprop;
+    this->bar[3] = this->telemetry->stageElec;
+    this->bar[4] = this->telemetry->stageXenon;
+
+    for (unsigned int b=0; b<5; b++) {
+        for (int i=0; i<10;i++) {
+            this->ledCtrl.setLed(0, this->addr[b][i][0], this->addr[b][i][1], i < this->bar[b]);
+        }
     }
-    digitalWrite(this->pinSerial, LOW);
-    for (int i=0; i<10-value; i++) {
-        digitalWrite(this->pinClock, LOW);
-        digitalWrite(this->pinClock, HIGH);
-    }
-    digitalWrite(this->pinLatch, HIGH);
 }

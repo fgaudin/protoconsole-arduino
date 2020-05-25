@@ -16,7 +16,7 @@ class Controller {
         Handler handlers[256];
         Telemetry telemetry;
         MainDisplay display;
-        BarGraph fuel;
+        BarGraph bars;
 
     public:
         bool connected;
@@ -31,6 +31,10 @@ class Controller {
         void handle_pitch(byte* value);
         void handle_twr(byte* value);
         void handleStageFuel(byte* value);
+        void handleStageOx(byte* value);
+        void handleStageMonoprop(byte* value);
+        void handleStageElec(byte* value);
+        void handleStageXenon(byte* value);
         void handle_periapsis(byte* value);
         void handle_apoapsis(byte* value);
         void handle_vertical_speed(byte* value);

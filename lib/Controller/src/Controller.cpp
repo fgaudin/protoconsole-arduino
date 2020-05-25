@@ -5,9 +5,9 @@
 const unsigned long refreshPeriod = 100000; // 100 ms
 const int pinAscentMode = 2;
 const int pinDebugMode = 3;
-const int pinFuelSerial = 4;
-const int pinFuelLatch = 5;
-const int pinFuelClock = 6;
+const int pinBarData = 8;
+const int pinBarClock = 9;
+const int pinBarLoad = 10;
 
 Controller::Controller() {
   this->lastUpdate = micros();
@@ -18,6 +18,10 @@ Controller::Controller() {
   this->handlers[70] = &Controller::handle_twr;
   this->handlers[71] = &Controller::handle_pitch;
   this->handlers[72] = &Controller::handleStageFuel;
+  this->handlers[73] = &Controller::handleStageOx;
+  this->handlers[74] = &Controller::handleStageMonoprop;
+  this->handlers[75] = &Controller::handleStageElec;
+  this->handlers[76] = &Controller::handleStageXenon;
   this->handlers[192] = &Controller::handle_periapsis;
   this->handlers[193] = &Controller::handle_apoapsis;
   this->handlers[194] = &Controller::handle_altitude;
@@ -35,8 +39,7 @@ void Controller::init()
   strcpy(this->display.debug_str, "controller ready");
   this->display.setMode(ascent);
 
-  this->fuel.init(pinFuelSerial, pinFuelLatch, pinFuelClock);
-  this->fuel.setSource(&this->telemetry.stageFuel);
+  this->bars.init(pinBarData, pinBarClock, pinBarLoad, &this->telemetry);
 }
 
 void Controller::checkInputs()
@@ -55,7 +58,7 @@ void Controller::update()
   this->checkInputs();
   if (now - this->lastUpdate > refreshPeriod) {
     this->display.refresh();
-    this->fuel.refresh();
+    this->bars.refresh();
     this->lastUpdate = now;
   }
 }
@@ -96,6 +99,25 @@ void Controller::handleStageFuel(byte* value)
   this->telemetry.stageFuel =(int) * (byte *) value;
 }
 
+void Controller::handleStageOx(byte* value)
+{
+  this->telemetry.stageOx =(int) * (byte *) value;
+}
+
+void Controller::handleStageMonoprop(byte* value)
+{
+  this->telemetry.stageMonoprop =(int) * (byte *) value;
+}
+
+void Controller::handleStageElec(byte* value)
+{
+  this->telemetry.stageElec =(int) * (byte *) value;
+}
+
+void Controller::handleStageXenon(byte* value)
+{
+  this->telemetry.stageXenon =(int) * (byte *) value;
+}
 
 void Controller::handle_pitch(byte* value)
 {
