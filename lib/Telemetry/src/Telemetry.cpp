@@ -1,8 +1,8 @@
 #include "Telemetry.h"
 
 Telemetry::Telemetry() {
-  this->solarPanel = false;
-  this->gear = false;
+  this->solarPanel = 0;
+  this->gear = 0;
   this->docked = false;
   this->lights = false;
   this->sas = false;
@@ -13,11 +13,16 @@ Telemetry::Telemetry() {
 
   this->twr = 0.0;
   this->pitch = 0;
-  this->stageFuel = 6;
-  this->stageOx = 3;
-  this->stageMonoprop = 8;
-  this->stageElec = 1;
-  this->stageXenon = 5;
+  this->stageFuel = 0;
+  this->stageOx = 0;
+  this->stageMonoprop = 0;
+  this->stageElec = 0;
+  this->stageXenon = 0;
+  this->stageO2 = 0;
+  this->stageH2O = 0;
+  this->stageFood = 0;
+  this->stageCO2 = 0;
+  this->stageWaste = 0;
 
   this->altitude = 0.0;
   this->periapsis = 0.0;

@@ -25,15 +25,28 @@ void BarGraph::init(int  pinData, int pinClock, int pinLoad, Telemetry* telemetr
 
     this->ledCtrl.shutdown(0,false);
     this->ledCtrl.setIntensity(0,15);
+    this->mode = fuel;
+}
+
+void BarGraph::setMode(BarGraphMode mode) {
+    this->mode = mode;
 }
 
 void BarGraph::refresh()
 {
-    this->bar[0] = this->telemetry->stageFuel;
-    this->bar[1] = this->telemetry->stageOx;
-    this->bar[2] = this->telemetry->stageMonoprop;
-    this->bar[3] = this->telemetry->stageElec;
-    this->bar[4] = this->telemetry->stageXenon;
+    if (this->mode == fuel) {
+        this->bar[0] = this->telemetry->stageFuel;
+        this->bar[1] = this->telemetry->stageOx;
+        this->bar[2] = this->telemetry->stageMonoprop;
+        this->bar[3] = this->telemetry->stageElec;
+        this->bar[4] = this->telemetry->stageXenon;
+    } else {
+        this->bar[0] = this->telemetry->stageO2;
+        this->bar[1] = this->telemetry->stageH2O;
+        this->bar[2] = this->telemetry->stageFood;
+        this->bar[3] = this->telemetry->stageCO2;
+        this->bar[4] = this->telemetry->stageWaste;
+    }
 
     for (unsigned int b=0; b<5; b++) {
         for (int i=0; i<10;i++) {

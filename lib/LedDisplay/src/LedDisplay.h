@@ -4,23 +4,18 @@
 #include <Telemetry.h>
 #include <LedControl.h>
 
-enum BarGraphMode {lifesupport, fuel};
-
-class BarGraph {
+class LedDisplay {
     private:
         int pinData;
         int pinClock;
         int pinLoad;
         Telemetry* telemetry;
         LedControl ledCtrl;
-        int bar[5] = {10, 10, 10, 10, 10};
-        // 5 bars, 10 leds, column & row
-        byte addr[5][10][2];
-        BarGraphMode mode;
 
     public:
-        BarGraph();
+        LedDisplay();
         void init(int  pinData, int pinClock, int pinLoad, Telemetry* telemetry);
-        void setMode(BarGraphMode mode);
         void refresh();
+        void _on(int led);
+        void _off(int led);
 };

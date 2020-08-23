@@ -4,8 +4,8 @@
 
 class Telemetry {
     public:
-        bool solarPanel;
-        bool gear;
+        int solarPanel;
+        int gear;
         bool docked;
         bool lights;
         bool sas;
@@ -21,6 +21,11 @@ class Telemetry {
         int stageMonoprop;
         int stageElec;
         int stageXenon;
+        int stageO2;
+        int stageH2O;
+        int stageFood;
+        int stageCO2;
+        int stageWaste;
 
         long altitude;
         long periapsis;

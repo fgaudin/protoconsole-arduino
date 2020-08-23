@@ -32,7 +32,7 @@ void listen()
       value_size = 4;
     }
     
-    int read = Serial.readBytes(value, value_size);
+    Serial.readBytes(value, value_size);
 
     if (cmd > 0 && cmd < 256) {
       controller.handle_command(cmd, value);
