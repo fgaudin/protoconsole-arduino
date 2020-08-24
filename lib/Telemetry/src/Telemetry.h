@@ -12,7 +12,7 @@ class Telemetry {
         bool rcs;
         bool brake;
         bool engine;
-        bool antenna;
+        int antenna;
         bool dot05g;
         bool contact;
 

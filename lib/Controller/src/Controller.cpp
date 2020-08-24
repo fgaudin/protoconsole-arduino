@@ -102,6 +102,7 @@ void Controller::handle_flags1(byte* value)
 {
   this->telemetry.solarPanel = (int) * (byte *) value & B00000011;
   this->telemetry.gear = ((int) * (byte *) value & B00001100) >> 2;
+  this->telemetry.antenna = ((int) * (byte *) value & B00110000) >> 4;
 }
 
 void Controller::handle_flags2(byte* value) {

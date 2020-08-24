@@ -61,32 +61,65 @@ void LedDisplay::_blink(int led) {
 
 void LedDisplay::refresh()
 {
-    if (this->telemetry->solarPanel == 3) {
-        this->_on(LED_SOLAR_ON);
-        this->_off(LED_SOLAR_OFF);
-    } else if (this->telemetry->solarPanel == 2) {
-        this->_off(LED_SOLAR_OFF);
-        this->_blink(LED_SOLAR_ON);
-    } else if (this->telemetry->solarPanel == 1) {
-        this->_blink(LED_SOLAR_OFF);
-        this->_off(LED_SOLAR_ON);
-    } else if (this->telemetry->solarPanel == 0) {
-        this->_on(LED_SOLAR_OFF);
-        this->_off(LED_SOLAR_ON);
+    switch (this->telemetry->solarPanel) {
+        case 3:
+            this->_on(LED_SOLAR_ON);
+            this->_off(LED_SOLAR_OFF);
+            break;
+        case 2:
+            this->_off(LED_SOLAR_OFF);
+            this->_blink(LED_SOLAR_ON);
+            break;
+        case 1:
+            this->_blink(LED_SOLAR_OFF);
+            this->_off(LED_SOLAR_ON);
+            break;
+        case 0:
+            this->_on(LED_SOLAR_OFF);
+            this->_off(LED_SOLAR_ON);
+            break;
     }
 
-    if (this->telemetry->gear == 3) {
-        this->_on(LED_GEAR_ON);
-        this->_off(LED_GEAR_OFF);
-    } else if (this->telemetry->gear == 2) {
-        this->_off(LED_GEAR_OFF);
-        this->_blink(LED_GEAR_ON);
-    } else if (this->telemetry->gear == 1) {
-        this->_blink(LED_GEAR_OFF);
-        this->_off(LED_GEAR_ON);
-    } else if (this->telemetry->gear == 0) {
-        this->_on(LED_GEAR_OFF);
-        this->_off(LED_GEAR_ON);
+    switch (this->telemetry->gear) {
+        case 3:
+            this->_on(LED_GEAR_ON);
+            this->_off(LED_GEAR_OFF);
+            break;
+        case 2:
+            this->_off(LED_GEAR_OFF);
+            this->_blink(LED_GEAR_ON);
+            break;
+        case 1:
+            this->_blink(LED_GEAR_OFF);
+            this->_off(LED_GEAR_ON);
+            break;
+        case 0:
+            this->_on(LED_GEAR_OFF);
+            this->_off(LED_GEAR_ON);
+            break;
+    }
+
+    switch (this->telemetry->antenna) {
+        case 3:
+            this->_on(LED_ANTENNA_GOOD);
+            this->_on(LED_ANTENNA_MEDIUM);
+            this->_on(LED_ANTENNA_BAD);
+            break;
+        case 2:
+            this->_off(LED_ANTENNA_GOOD);
+            this->_on(LED_ANTENNA_MEDIUM);
+            this->_on(LED_ANTENNA_BAD);
+            break;
+        case 1:
+            this->_off(LED_ANTENNA_GOOD);
+            this->_off(LED_ANTENNA_MEDIUM);
+            this->_on(LED_ANTENNA_BAD);
+            break;
+        default:
+            this->_off(LED_ANTENNA_GOOD);
+            this->_off(LED_ANTENNA_MEDIUM);
+            this->_off(LED_ANTENNA_BAD);
+            break;
     }
 
     this->_toggle(LED_RCS, this->telemetry->rcs);
