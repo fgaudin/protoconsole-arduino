@@ -13,6 +13,8 @@ class Telemetry {
         bool brake;
         bool engine;
         bool antenna;
+        bool dot05g;
+        bool contact;
 
         float twr;
         int pitch;

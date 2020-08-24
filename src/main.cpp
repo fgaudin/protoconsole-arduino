@@ -23,18 +23,16 @@ void listen()
     int value_size = 0;
     byte value[4];
 
-    if (cmd < 64) {
-    } else if (cmd < 128) {
+    if (cmd < 8) {
+    } else if (cmd < 32) {
       value_size = 1;
-    } else if (cmd < 192) {
-      value_size = 2;
     } else {
       value_size = 4;
     }
     
     Serial.readBytes(value, value_size);
 
-    if (cmd > 0 && cmd < 256) {
+    if (cmd > 0 && cmd < 64) {
       controller.handle_command(cmd, value);
     } else {
       //debug("command out of range");

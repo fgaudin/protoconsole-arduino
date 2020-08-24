@@ -32,6 +32,7 @@ Controller::Controller() {
   this->handlers[18] = &Controller::handleStageFood;
   this->handlers[19] = &Controller::handleStageCO2;
   this->handlers[20] = &Controller::handleStageWaste;
+  this->handlers[21] = &Controller::handle_flags2;
   this->handlers[32] = &Controller::handle_periapsis;
   this->handlers[33] = &Controller::handle_apoapsis;
   this->handlers[34] = &Controller::handle_altitude;
@@ -44,14 +45,13 @@ Controller::Controller() {
 void Controller::init()
 {
   this->leds.init(pinLedData, pinLedClock, pinLedLoad, &this->telemetry);
-  Serial.println("here");
   pinMode(pinAscentMode, INPUT_PULLUP);
   pinMode(pinDebugMode, INPUT_PULLUP);
   pinMode(pinLifeSupportMode, INPUT_PULLUP);
   pinMode(pinFuelMode, INPUT_PULLUP);
   this->display.init(&this->telemetry);
   strcpy(this->display.debug_str, "controller ready");
-  this->display.setMode(ascent);
+  this->display.setMode(debug);
 
   this->bars.init(pinBarData, pinBarClock, pinBarLoad, &this->telemetry);
 }
@@ -101,17 +101,17 @@ void Controller::handle_hello(byte* value)
 void Controller::handle_flags1(byte* value)
 {
   this->telemetry.solarPanel = (int) * (byte *) value & B00000011;
-  this->telemetry.gear = (int) * (byte *) value & B00001100;
-  itoa((int) * (byte *) value, this->display.debug_str, 10);
+  this->telemetry.gear = ((int) * (byte *) value & B00001100) >> 2;
 }
 
 void Controller::handle_flags2(byte* value) {
-  this->telemetry.docked = bitRead(value[0], 2);
-  this->telemetry.lights = bitRead(value[0], 3);
-  this->telemetry.rcs = bitRead(value[0], 4);
-  this->telemetry.sas = bitRead(value[0], 5);
-  this->telemetry.brake = bitRead(value[0], 6);
-  this->telemetry.antenna = bitRead(value[0], 7);
+  this->telemetry.rcs = bitRead(value[0], 0);
+  this->telemetry.sas = bitRead(value[0], 1);
+  this->telemetry.brake = bitRead(value[0], 2);
+  this->telemetry.docked = bitRead(value[0], 3);  
+  this->telemetry.lights = bitRead(value[0], 4);
+  this->telemetry.dot05g = bitRead(value[0], 5);
+  this->telemetry.contact = bitRead(value[0], 6);
 }
 
 void Controller::handle_twr(byte* value)

@@ -14,6 +14,11 @@ void MainDisplay::init(Telemetry* telemetry)
     this->lcd.home();
     this->lcd.clear();
     this->lcd.print("Display initialized");
+    delay(500);
+    this->lcd.home();
+    this->lcd.clear();
+    this->lcd.print("Ready");
+    delay(500);
 }
 
 void MainDisplay::setMode(DisplayMode mode)
@@ -58,6 +63,7 @@ void MainDisplay::refresh()
 {
     if (this->mode == debug) {
         this->lcd.home();
+        this->lcd.clear();
         this->lcd.print(this->debug_str);
     } else if (this->mode == ascent) {
         int colLeft = 1;
