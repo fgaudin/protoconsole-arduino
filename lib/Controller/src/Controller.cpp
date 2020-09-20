@@ -103,6 +103,7 @@ void Controller::handle_flags1(byte* value)
   this->telemetry.solarPanel = (int) * (byte *) value & B00000011;
   this->telemetry.gear = ((int) * (byte *) value & B00001100) >> 2;
   this->telemetry.antenna = ((int) * (byte *) value & B00110000) >> 4;
+  this->telemetry.stage = bitRead(value[0], 6);
 }
 
 void Controller::handle_flags2(byte* value) {
@@ -113,6 +114,7 @@ void Controller::handle_flags2(byte* value) {
   this->telemetry.lights = bitRead(value[0], 4);
   this->telemetry.dot05g = bitRead(value[0], 5);
   this->telemetry.contact = bitRead(value[0], 6);
+  this->telemetry.master_alarm = bitRead(value[0], 7);
 }
 
 void Controller::handle_twr(byte* value)

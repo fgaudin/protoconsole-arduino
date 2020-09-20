@@ -16,6 +16,7 @@
 #define LED_ANTENNA_GOOD 15
 #define LED_ANTENNA_MEDIUM 9
 #define LED_ANTENNA_BAD 8
+#define LED_MASTER_ALARM 16
 
 
 LedDisplay::LedDisplay() : 
@@ -130,4 +131,11 @@ void LedDisplay::refresh()
     this->_toggle(LED_LIGHT, this->telemetry->lights);
     this->_toggle(LED_005G, this->telemetry->dot05g);
     this->_toggle(LED_CONTACT, this->telemetry->contact);
+    this->_toggle(LED_STAGE, this->telemetry->stage);
+
+    if (this->telemetry->master_alarm) {
+        this->_blink(LED_MASTER_ALARM);
+    } else {
+        this->_off(LED_MASTER_ALARM);
+    }
 }

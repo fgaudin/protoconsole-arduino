@@ -15,6 +15,8 @@ class Telemetry {
         int antenna;
         bool dot05g;
         bool contact;
+        bool master_alarm;
+        bool stage;
 
         float twr;
         int pitch;
