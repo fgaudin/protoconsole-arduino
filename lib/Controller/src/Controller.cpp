@@ -3,16 +3,18 @@
 #define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
 
 const unsigned long refreshPeriod = 100000; // 100 ms
-const int pinAscentMode = 2;
-const int pinDebugMode = 3;
-const int pinLifeSupportMode = 4;
-const int pinFuelMode = 5;
+const int inputInterruptPin = 2;
+const int inputClockPin = 3;
+const int inputLoadPin = 4;
+const int inputSerialIn = 5;
 const int pinBarData = 8;
 const int pinBarClock = 9;
 const int pinBarLoad = 10;
 const int pinLedData = 11;
 const int pinLedClock = 12;
 const int pinLedLoad = 13;
+
+volatile int incoming;
 
 Controller::Controller() {
   this->lastUpdate = micros();
@@ -40,15 +42,34 @@ Controller::Controller() {
   this->handlers[36] = &Controller::handle_horizontal_speed;
 
   this->connected = false;
+  this->button_states = 0;
+  incoming = 0;
+}
+
+void readButtons(){
+  digitalWrite(inputLoadPin, LOW);
+  delayMicroseconds(1);
+  digitalWrite(inputLoadPin, HIGH);
+  delayMicroseconds(1);
+
+  digitalWrite(inputClockPin, LOW);
+  for (int i=0;i<16; i++) {
+    bitWrite(incoming, i, digitalRead(inputSerialIn));
+    digitalWrite(inputClockPin, HIGH);
+    delayMicroseconds(1);
+    digitalWrite(inputClockPin, LOW);
+  }
 }
 
 void Controller::init()
 {
+  pinMode(inputClockPin, OUTPUT);
+  pinMode(inputLoadPin, OUTPUT);
+  pinMode(inputSerialIn, INPUT);
+  pinMode(inputInterruptPin, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(inputInterruptPin), readButtons, CHANGE);
+
   this->leds.init(pinLedData, pinLedClock, pinLedLoad, &this->telemetry);
-  pinMode(pinAscentMode, INPUT_PULLUP);
-  pinMode(pinDebugMode, INPUT_PULLUP);
-  pinMode(pinLifeSupportMode, INPUT_PULLUP);
-  pinMode(pinFuelMode, INPUT_PULLUP);
   this->display.init(&this->telemetry);
   strcpy(this->display.debug_str, "controller ready");
   this->display.setMode(debug);
@@ -58,6 +79,38 @@ void Controller::init()
 
 void Controller::checkInputs()
 {
+  if (bitRead(incoming, 2)) {
+    strcpy(this->display.debug_str, "Undock");
+  }
+  if (bitRead(incoming, 3)) {
+    strcpy(this->display.debug_str, "Lights");
+  }
+  if (bitRead(incoming, 4)) {
+    strcpy(this->display.debug_str, "RCS");
+  }
+  if (bitRead(incoming, 5)) {
+    strcpy(this->display.debug_str, "SAS");
+  }
+  if (bitRead(incoming, 6)) {
+    strcpy(this->display.debug_str, "Stage");
+  }
+  if (incoming ^ this->button_states) {
+    this->button_states = incoming;
+    for (int i=0; i<16; i++) {
+      if (incoming & (1 << (16 - i))) {
+        this->display.debug_str[i] = '1';
+      } else {
+        this->display.debug_str[i] = '0';
+      }
+    }
+    this->display.debug_str[16] = '\0';
+    Serial.write(B11111111);
+    Serial.write(B00000000);
+    Serial.write((byte *) &incoming, 2);
+  }
+  readButtons();
+
+  /*
   if(!digitalRead(pinAscentMode)) {
     this->display.setMode(ascent);
   }
@@ -69,14 +122,14 @@ void Controller::checkInputs()
   }
   if(!digitalRead(pinFuelMode)) {
     this->bars.setMode(fuel);
-  }
+  }*/
 }
 
 void Controller::update()
 {
   unsigned long now = micros();
-  this->checkInputs();
   if (now - this->lastUpdate > refreshPeriod) {
+    this->checkInputs();
     this->display.refresh();
     this->bars.refresh();
     this->leds.refresh();
