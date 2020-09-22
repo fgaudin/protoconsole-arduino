@@ -79,31 +79,15 @@ void Controller::init()
 
 void Controller::checkInputs()
 {
-  if (bitRead(incoming, 2)) {
-    strcpy(this->display.debug_str, "Undock");
-  }
-  if (bitRead(incoming, 3)) {
-    strcpy(this->display.debug_str, "Lights");
-  }
-  if (bitRead(incoming, 4)) {
-    strcpy(this->display.debug_str, "RCS");
-  }
-  if (bitRead(incoming, 5)) {
-    strcpy(this->display.debug_str, "SAS");
-  }
-  if (bitRead(incoming, 6)) {
-    strcpy(this->display.debug_str, "Stage");
-  }
   if (incoming ^ this->button_states) {
-    this->button_states = incoming;
-    for (int i=0; i<16; i++) {
-      if (incoming & (1 << (16 - i))) {
-        this->display.debug_str[i] = '1';
-      } else {
-        this->display.debug_str[i] = '0';
-      }
+    if (bitRead(incoming, 12)) {
+      this->telemetry.stage = 1;
+    } else {
+      // if staging is not engaged, drop any stage button press
+      bitWrite(incoming, 6, 0);
+      this->telemetry.stage = 0;
     }
-    this->display.debug_str[16] = '\0';
+
     Serial.write(B11111111);
     Serial.write(B00000000);
     Serial.write((byte *) &incoming, 2);
@@ -156,7 +140,6 @@ void Controller::handle_flags1(byte* value)
   this->telemetry.solarPanel = (int) * (byte *) value & B00000011;
   this->telemetry.gear = ((int) * (byte *) value & B00001100) >> 2;
   this->telemetry.antenna = ((int) * (byte *) value & B00110000) >> 4;
-  this->telemetry.stage = bitRead(value[0], 6);
 }
 
 void Controller::handle_flags2(byte* value) {
