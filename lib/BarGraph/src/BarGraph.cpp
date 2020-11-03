@@ -28,6 +28,16 @@ void BarGraph::init(int  pinData, int pinClock, int pinLoad, Telemetry* telemetr
     this->mode = fuel;
 }
 
+void BarGraph::test() {
+    for (unsigned int b=0; b<5; b++) {
+        for (int i=0; i<10;i++) {
+            this->ledCtrl.setLed(0, this->addr[b][i][0], this->addr[b][i][1], true);
+            delay(500);
+            this->ledCtrl.setLed(0, this->addr[b][i][0], this->addr[b][i][1], false);
+        }
+    }
+}
+
 void BarGraph::setMode(BarGraphMode mode) {
     this->mode = mode;
 }

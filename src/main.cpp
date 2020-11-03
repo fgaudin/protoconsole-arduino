@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <Controller.h>
+#define TEST 0
 
 
 bool connected = false;
@@ -52,5 +53,9 @@ void normal_loop()
 }
 
 void loop() {
-  normal_loop();
+  if (TEST) {
+    controller.test();
+  } else {
+    normal_loop();
+  }
 }

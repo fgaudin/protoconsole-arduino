@@ -15,6 +15,7 @@ class LedDisplay {
     public:
         LedDisplay();
         void init(int  pinData, int pinClock, int pinLoad, Telemetry* telemetry);
+        void test();
         void refresh();
         void _toggle(int led, bool val);
         void _on(int led);

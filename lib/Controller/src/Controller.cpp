@@ -7,6 +7,8 @@ const int inputInterruptPin = 2;
 const int inputClockPin = 3;
 const int inputLoadPin = 4;
 const int inputSerialIn = 5;
+const int inputFuel = 6;
+const int inputLifeSupport = 7;
 const int pinBarData = 8;
 const int pinBarClock = 9;
 const int pinBarLoad = 10;
@@ -77,6 +79,11 @@ void Controller::init()
   this->bars.init(pinBarData, pinBarClock, pinBarLoad, &this->telemetry);
 }
 
+void Controller::test() {
+  this->leds.test();
+  this->bars.test();
+}
+
 void Controller::checkInputs()
 {
   if (incoming ^ this->button_states) {
@@ -88,25 +95,30 @@ void Controller::checkInputs()
       this->telemetry.stage = 0;
     }
 
+    if (bitRead(incoming, 7)) {
+      this->display.setMode(ascent);
+    }
+    if(bitRead(incoming, 1)) {
+      this->display.setMode(orbit);
+    }
+    if (bitRead(incoming, 0)) {
+      this->display.setMode(descent);
+    }
+    if(bitRead(incoming, 11)) {
+      this->display.setMode(docking);
+    }
+    if(digitalRead(inputLifeSupport)) {
+      this->bars.setMode(lifesupport);
+    }
+    if(digitalRead(inputFuel)) {
+      this->bars.setMode(fuel);
+    }
+
     Serial.write(B11111111);
     Serial.write(B00000000);
     Serial.write((byte *) &incoming, 2);
   }
   readButtons();
-
-  /*
-  if(!digitalRead(pinAscentMode)) {
-    this->display.setMode(ascent);
-  }
-  if(!digitalRead(pinDebugMode)) {
-    this->display.setMode(debug);
-  }
-  if(!digitalRead(pinLifeSupportMode)) {
-    this->bars.setMode(lifesupport);
-  }
-  if(!digitalRead(pinFuelMode)) {
-    this->bars.setMode(fuel);
-  }*/
 }
 
 void Controller::update()

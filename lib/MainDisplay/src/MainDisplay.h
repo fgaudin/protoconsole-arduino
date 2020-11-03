@@ -5,7 +5,7 @@
 #include <Wire.h>
 #include <Telemetry.h>
 
-enum DisplayMode {debug, ascent, orbit, descent};
+enum DisplayMode {debug, ascent, orbit, descent, docking};
 
 class MainDisplay {
     private:

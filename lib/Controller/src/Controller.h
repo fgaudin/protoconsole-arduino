@@ -26,6 +26,7 @@ class Controller {
         
         Controller();
         void init();
+        void test();
         void checkInputs();
         void update();
         void handle_command(byte command, byte* value);

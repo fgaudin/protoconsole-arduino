@@ -32,8 +32,6 @@ void MainDisplay::setMode(DisplayMode mode)
     this->lcd.clear();
 
     if (this->mode == debug) {
-        this->lcd.setCursor(19, 3);
-        this->lcd.print(rightArrow);
         this->lcd.home();
     } else if (this->mode == ascent) {
         this->lcd.setCursor(0, 0);
@@ -56,6 +54,15 @@ void MainDisplay::setMode(DisplayMode mode)
         this->lcd.print("TWR:00000");
         this->lcd.setCursor(colRight, row++);
         this->lcd.print("Pch:0000");
+    } else if (this->mode == orbit) {
+        this->lcd.setCursor(0, 1);
+        this->lcd.print(leftArrow);
+    } else if (this->mode == descent) {
+        this->lcd.setCursor(0, 2);
+        this->lcd.print(leftArrow);
+    } else if (this->mode == docking) {
+        this->lcd.setCursor(0, 3);
+        this->lcd.print(leftArrow);
     }
 }
 

@@ -1,21 +1,21 @@
 #include "LedDisplay.h"
 
-#define LED_SOLAR_OFF 7
-#define LED_SOLAR_ON 4
-#define LED_BRAKE_OFF 6
-#define LED_BRAKE_ON 2
-#define LED_GEAR_OFF 5
-#define LED_GEAR_ON 3
-#define LED_005G 0
-#define LED_CONTACT 1
-#define LED_STAGE 14
-#define LED_SAS 12
-#define LED_RCS 13
-#define LED_LIGHT 11
-#define LED_DOCKED 10
-#define LED_ANTENNA_GOOD 15
-#define LED_ANTENNA_MEDIUM 9
-#define LED_ANTENNA_BAD 8
+#define LED_SOLAR_OFF 12
+#define LED_SOLAR_ON 8
+#define LED_BRAKE_OFF 15
+#define LED_BRAKE_ON 10
+#define LED_GEAR_OFF 13
+#define LED_GEAR_ON 11
+#define LED_005G 9
+#define LED_CONTACT 14
+#define LED_STAGE 1
+#define LED_SAS 2
+#define LED_RCS 6
+#define LED_LIGHT 3
+#define LED_DOCKED 7
+#define LED_ANTENNA_GOOD 5
+#define LED_ANTENNA_MEDIUM 0
+#define LED_ANTENNA_BAD 4
 #define LED_MASTER_ALARM 16
 
 
@@ -37,6 +37,14 @@ void LedDisplay::init(int  pinData, int pinClock, int pinLoad, Telemetry* teleme
 
     this->ledCtrl.shutdown(0,false);
     this->ledCtrl.setIntensity(0,15);
+}
+
+void LedDisplay::test() {
+    for (int i=0; i<=16; i++) {
+        this->_on(i);
+        delay(3000);
+        this->_off(i);
+    }
 }
 
 void LedDisplay::_toggle(int led, bool val) {

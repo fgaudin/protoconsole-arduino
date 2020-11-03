@@ -23,4 +23,5 @@ class BarGraph {
         void init(int  pinData, int pinClock, int pinLoad, Telemetry* telemetry);
         void setMode(BarGraphMode mode);
         void refresh();
+        void test();
 };
