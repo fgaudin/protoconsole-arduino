@@ -5,18 +5,16 @@
 #include <Wire.h>
 #include <Telemetry.h>
 
-enum DisplayMode {debug, ascent, orbit, descent, docking};
-
 class MainDisplay {
     private:
         Telemetry* telemetry;
-        DisplayMode mode;
+        Mode mode;
         LiquidCrystal_PCF8574 lcd;
     public:
         char debug_str[80];
         MainDisplay();
         void init(Telemetry* telemetry);
-        void setMode(DisplayMode mode);
+        void setMode(Mode mode);
         void refresh();
         void print(const char* str);
 };

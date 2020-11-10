@@ -99,6 +99,7 @@ void Controller::checkInputs()
 
     if (bitRead(incoming, 7)) {
       this->display.setMode(ascent);
+      this->seg7.setMode(ascent);
     }
     if(bitRead(incoming, 1)) {
       this->display.setMode(orbit);
@@ -128,6 +129,7 @@ void Controller::update()
   unsigned long now = micros();
   if (now - this->lastUpdate > refreshPeriod) {
     this->checkInputs();
+    this->seg7.refresh();
     this->display.refresh();
     this->bars.refresh();
     this->leds.refresh();

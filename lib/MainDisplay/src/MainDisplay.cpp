@@ -21,7 +21,7 @@ void MainDisplay::init(Telemetry* telemetry)
     delay(500);
 }
 
-void MainDisplay::setMode(DisplayMode mode)
+void MainDisplay::setMode(Mode mode)
 {
     if (mode == this->mode) {
         return;

@@ -2,6 +2,8 @@
 
 #include <Arduino.h>
 
+enum Mode {debug, ascent, orbit, descent, docking};
+
 class Telemetry {
     public:
         int solarPanel;

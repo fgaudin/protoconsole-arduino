@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <Controller.h>
-#define TEST 1
+#define TEST 0
 
 
 bool connected = false;
