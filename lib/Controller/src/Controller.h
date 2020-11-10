@@ -5,6 +5,7 @@
 #include <MainDisplay.h>
 #include <BarGraph.h>
 #include <LedDisplay.h>
+#include <SevenSegment.h>
 
 
 class Controller;
@@ -20,6 +21,7 @@ class Controller {
         MainDisplay display;
         BarGraph bars;
         LedDisplay leds;
+        SevenSegment seg7;
 
     public:
         bool connected;

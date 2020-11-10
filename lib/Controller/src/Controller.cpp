@@ -72,6 +72,7 @@ void Controller::init()
   attachInterrupt(digitalPinToInterrupt(inputInterruptPin), readButtons, CHANGE);
 
   this->leds.init(pinLedData, pinLedClock, pinLedLoad, &this->telemetry);
+  this->seg7.init(&this->telemetry);
   this->display.init(&this->telemetry);
   strcpy(this->display.debug_str, "controller ready");
   this->display.setMode(debug);
@@ -80,6 +81,7 @@ void Controller::init()
 }
 
 void Controller::test() {
+  this->seg7.test();
   this->leds.test();
   this->bars.test();
 }
