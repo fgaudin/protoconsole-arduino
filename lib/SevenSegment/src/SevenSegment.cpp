@@ -27,17 +27,34 @@ void SevenSegment::test() {
     this->ledCtrl.clearDisplay(0);
 }
 
+void SevenSegment::_printValue(float value, int decimals) {
+    char string[10];
+    dtostrf(value, 9, decimals, string);
+
+    unsigned int i = 0;
+    bool dp = false;
+    char digit;
+
+    for (int j=0; j<8; j++) {
+        digit = string[strlen(string) - i - 1];
+        i++;
+        if (digit == '.') {
+            dp = true;
+            digit = string[strlen(string) - i - 1];
+            i++;
+        } else {
+            dp = false;
+        }
+        this->ledCtrl.setChar(0, j, digit, dp);
+    }
+}
+
 void SevenSegment::refresh()
 {
     if (this->mode == debug) {
-        for (int i=0; i<8; i++) {
-            this->ledCtrl.setDigit(0,i,8,true);
-        }
+        this->_printValue(88888888, 0);
     } else if (this->mode == ascent) {
-        for (int i=0; i<8; i++) {
-            int value = (this->telemetry->horizontalSpeed / i) % 10;
-            this->ledCtrl.setDigit(0,i,value,false);
-        }
+        
     }
 }
 

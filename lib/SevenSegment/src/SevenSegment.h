@@ -15,5 +15,6 @@ class SevenSegment {
         void init(Telemetry* telemetry);
         void test();
         void refresh();
+        void _printValue(float value, int decimals);
         void setMode(Mode mode);
 };
