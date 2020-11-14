@@ -54,6 +54,8 @@ void MainDisplay::setMode(Mode mode)
         this->lcd.print("TWR:00000");
         this->lcd.setCursor(colRight, row++);
         this->lcd.print("Pch:0000");
+        this->lcd.setCursor(colRight, row++);
+        this->lcd.print("  Q:0000");
     } else if (this->mode == orbit) {
         this->lcd.setCursor(0, 1);
         this->lcd.print(leftArrow);
@@ -116,6 +118,12 @@ void MainDisplay::refresh()
         memset(data, 0, 8);
         this->lcd.setCursor(colRight+4, 2);
         ltoa(this->telemetry->pitch, data, 10);
+        padLeft(' ', data, 5);
+        this->lcd.print(data);
+
+        memset(data, 0, 8);
+        this->lcd.setCursor(colRight+4, 3);
+        metricfy(this->telemetry->q, data);
         padLeft(' ', data, 5);
         this->lcd.print(data);
     }

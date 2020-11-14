@@ -37,6 +37,7 @@ class Controller {
         void handle_flags2(byte* value);
         void handle_pitch(byte* value);
         void handle_twr(byte* value);
+        void handle_q(byte* value);
         void handleStageFuel(byte* value);
         void handleStageOx(byte* value);
         void handleStageMonoprop(byte* value);

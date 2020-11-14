@@ -35,6 +35,7 @@ void SevenSegment::_printValue(float value, int decimals) {
     bool dp = false;
     char digit;
 
+    this->ledCtrl.clearDisplay(0);
     for (int j=0; j<8; j++) {
         digit = string[strlen(string) - i - 1];
         i++;
@@ -54,7 +55,11 @@ void SevenSegment::refresh()
     if (this->mode == debug) {
         this->_printValue(88888888, 0);
     } else if (this->mode == ascent) {
-        
+        if (this->telemetry->altitude < 3000) {
+            this->_printValue(1, 0);
+        } else {
+            this->_printValue(2, 0);
+        }
     }
 }
 

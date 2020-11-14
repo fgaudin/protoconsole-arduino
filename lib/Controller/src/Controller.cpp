@@ -42,6 +42,7 @@ Controller::Controller() {
   this->handlers[34] = &Controller::handle_altitude;
   this->handlers[35] = &Controller::handle_vertical_speed;
   this->handlers[36] = &Controller::handle_horizontal_speed;
+  this->handlers[37] = &Controller::handle_q;
 
   this->connected = false;
   this->button_states = 0;
@@ -252,4 +253,9 @@ void Controller::handle_horizontal_speed(byte* value)
 void Controller::handle_altitude(byte* value)
 {
   this->telemetry.altitude = * (long *) value;
+}
+
+void Controller::handle_q(byte* value)
+{
+  this->telemetry.q = * (long *) value;
 }

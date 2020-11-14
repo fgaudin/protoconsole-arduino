@@ -21,6 +21,7 @@ class Telemetry {
         bool stage;
 
         float twr;
+        float q;
         int pitch;
         int stageFuel;
         int stageOx;

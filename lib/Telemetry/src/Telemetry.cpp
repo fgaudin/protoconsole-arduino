@@ -12,6 +12,7 @@ Telemetry::Telemetry() {
   this->antenna = false;
 
   this->twr = 0.0;
+  this->q = 0.0;
   this->pitch = 0;
   this->stageFuel = 0;
   this->stageOx = 0;
