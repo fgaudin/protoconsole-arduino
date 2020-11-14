@@ -3,6 +3,8 @@
 #define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
 
 const unsigned long refreshPeriod = 100000; // 100 ms
+const unsigned long debouncePeriod = 100000; // 100 ms
+unsigned long lastButtonRead = 0;
 const int inputInterruptPin = 2;
 const int inputClockPin = 3;
 const int inputLoadPin = 4;
@@ -20,6 +22,7 @@ volatile int incoming;
 
 Controller::Controller() {
   this->lastUpdate = micros();
+  lastButtonRead = micros();
   this->handlers[0] = nullptr;
   this->handlers[1] = &Controller::handle_hello;
   this->handlers[2] = nullptr;
@@ -50,6 +53,12 @@ Controller::Controller() {
 }
 
 void readButtons(){
+  unsigned long now = micros();
+  if (now - lastButtonRead < debouncePeriod) {
+    return;
+  }
+
+  lastButtonRead = now;
   digitalWrite(inputLoadPin, LOW);
   delayMicroseconds(1);
   digitalWrite(inputLoadPin, HIGH);
@@ -127,9 +136,9 @@ void Controller::checkInputs()
 
 void Controller::update()
 {
+  this->checkInputs();
   unsigned long now = micros();
   if (now - this->lastUpdate > refreshPeriod) {
-    this->checkInputs();
     this->seg7.refresh();
     this->display.refresh();
     this->bars.refresh();
