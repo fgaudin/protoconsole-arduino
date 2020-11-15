@@ -15,7 +15,6 @@ typedef void (Controller::*Handler)(byte*);
 class Controller {
     private:
         unsigned long lastUpdate;
-        int button_states;
         Handler handlers[64];
         Telemetry telemetry;
         MainDisplay display;
@@ -29,6 +28,9 @@ class Controller {
         Controller();
         void init();
         void test();
+        void _checkLocalPushButtons();
+        void _checkRemotePushButtons();
+        void _checkStateSwitches();
         void checkInputs();
         void update();
         void handle_command(byte command, byte* value);

@@ -3,8 +3,6 @@
 #define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
 
 const unsigned long refreshPeriod = 100000; // 100 ms
-const unsigned long debouncePeriod = 100000; // 100 ms
-unsigned long lastButtonRead = 0;
 const int inputInterruptPin = 2;
 const int inputClockPin = 3;
 const int inputLoadPin = 4;
@@ -19,10 +17,18 @@ const int pinLedClock = 12;
 const int pinLedLoad = 13;
 
 volatile int incoming;
+volatile int currentIncoming;
+volatile bool sent = false;
+
+const int switches = 1;
+const int lights = 2;
+const int undock = 3;
+const int rcs = 4;
+const int sas = 5;
+const int stage = 6;
 
 Controller::Controller() {
   this->lastUpdate = micros();
-  lastButtonRead = micros();
   this->handlers[0] = nullptr;
   this->handlers[1] = &Controller::handle_hello;
   this->handlers[2] = nullptr;
@@ -48,17 +54,11 @@ Controller::Controller() {
   this->handlers[37] = &Controller::handle_q;
 
   this->connected = false;
-  this->button_states = 0;
   incoming = 0;
+  currentIncoming = 0;
 }
 
 void readButtons(){
-  unsigned long now = micros();
-  if (now - lastButtonRead < debouncePeriod) {
-    return;
-  }
-
-  lastButtonRead = now;
   digitalWrite(inputLoadPin, LOW);
   delayMicroseconds(1);
   digitalWrite(inputLoadPin, HIGH);
@@ -66,10 +66,21 @@ void readButtons(){
 
   digitalWrite(inputClockPin, LOW);
   for (int i=0;i<16; i++) {
-    bitWrite(incoming, i, digitalRead(inputSerialIn));
+    bitWrite(currentIncoming, i, digitalRead(inputSerialIn));
     digitalWrite(inputClockPin, HIGH);
     delayMicroseconds(1);
     digitalWrite(inputClockPin, LOW);
+  }
+
+  int pushButtonMask = (B00001000 << 8) | B11111111;
+  // registering latest state of switches and doing cumulative for pushbuttons
+  // i.e. if a push button was on in the previous check and didn't get sent
+  // it's still considered on.
+  if (sent) {
+    incoming = currentIncoming;
+    sent = false;
+  } else {
+    incoming = currentIncoming | (incoming & pushButtonMask);
   }
 }
 
@@ -96,49 +107,86 @@ void Controller::test() {
   this->bars.test();
 }
 
+void Controller::_checkLocalPushButtons()
+{
+  if (bitRead(incoming, 7)) {
+    this->display.setMode(ascent);
+    this->seg7.setMode(ascent);
+  }
+  if(bitRead(incoming, 1)) {
+    this->display.setMode(orbit);
+  }
+  if (bitRead(incoming, 0)) {
+    this->display.setMode(descent);
+  }
+  if(bitRead(incoming, 11)) {
+    this->display.setMode(docking);
+  }
+  if(digitalRead(inputLifeSupport)) {
+    this->bars.setMode(lifesupport);
+  }
+  if(digitalRead(inputFuel)) {
+    this->bars.setMode(fuel);
+  }
+  this->telemetry.stage = bitRead(incoming, 12);
+}
+
+void Controller::_checkRemotePushButtons()
+{
+  /* for push buttons, we don't want to send the state of the button
+  but the expected action
+  i.e. if SAS was off locally, a button press means we want it on
+  if pressed twice, and we still had not received the update from
+  the state of the vessel, that means we still want it on. */
+
+  if (bitRead(incoming, 2)) {
+    Serial.write(undock);
+    Serial.write(true);
+  }
+  if (bitRead(incoming, 3)) {
+    Serial.write(lights);
+    Serial.write(!this->telemetry.lights);
+  }
+  if (bitRead(incoming, 4)) {
+    Serial.write(rcs);
+    Serial.write(!this->telemetry.rcs);
+  }
+  if (bitRead(incoming, 5)) {
+    Serial.write(sas);
+    Serial.write(!this->telemetry.sas);
+  }
+  if (this->telemetry.stage && bitRead(incoming, 6)) {
+    Serial.write(stage);
+    Serial.write(true);
+  }
+}
+
+void Controller::_checkStateSwitches()
+{
+  Serial.write(switches);
+  // 4 bits: engine, solar, gear, brakes
+  int val = 0;
+  val = val | bitRead(incoming, 13); // engine
+  val = val | (bitRead(incoming, 14) << 1); // solar
+  val = val | (bitRead(incoming, 15) << 2); // gear
+  val = val | (bitRead(incoming, 9) << 3); // brakes
+  Serial.write(val);
+}
+
 void Controller::checkInputs()
 {
-  if (incoming ^ this->button_states) {
-    if (bitRead(incoming, 12)) {
-      this->telemetry.stage = 1;
-    } else {
-      // if staging is not engaged, drop any stage button press
-      bitWrite(incoming, 6, 0);
-      this->telemetry.stage = 0;
-    }
-
-    if (bitRead(incoming, 7)) {
-      this->display.setMode(ascent);
-      this->seg7.setMode(ascent);
-    }
-    if(bitRead(incoming, 1)) {
-      this->display.setMode(orbit);
-    }
-    if (bitRead(incoming, 0)) {
-      this->display.setMode(descent);
-    }
-    if(bitRead(incoming, 11)) {
-      this->display.setMode(docking);
-    }
-    if(digitalRead(inputLifeSupport)) {
-      this->bars.setMode(lifesupport);
-    }
-    if(digitalRead(inputFuel)) {
-      this->bars.setMode(fuel);
-    }
-
-    Serial.write(B11111111);
-    Serial.write(B00000000);
-    Serial.write((byte *) &incoming, 2);
-  }
   readButtons();
+  this->_checkLocalPushButtons();
+  this->_checkRemotePushButtons();
+  this->_checkStateSwitches();
+  sent = true;
 }
 
 void Controller::update()
 {
-  this->checkInputs();
   unsigned long now = micros();
   if (now - this->lastUpdate > refreshPeriod) {
+    this->checkInputs();
     this->seg7.refresh();
     this->display.refresh();
     this->bars.refresh();
