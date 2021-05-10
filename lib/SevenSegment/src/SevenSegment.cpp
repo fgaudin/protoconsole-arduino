@@ -28,15 +28,15 @@ void SevenSegment::test() {
 }
 
 void SevenSegment::_printValue(float value, int decimals) {
-    char string[10];
-    dtostrf(value, 9, decimals, string);
+    char string[34];
+    dtostrf(value, 33, decimals, string);
 
     unsigned int i = 0;
     bool dp = false;
     char digit;
 
     this->ledCtrl.clearDisplay(0);
-    for (int j=0; j<8; j++) {
+    for (unsigned int j=0; j<strlen(string); j++) {
         digit = string[strlen(string) - i - 1];
         i++;
         if (digit == '.') {
@@ -53,12 +53,14 @@ void SevenSegment::_printValue(float value, int decimals) {
 void SevenSegment::refresh()
 {
     if (this->mode == debug) {
-        this->_printValue(88888888, 0);
+        this->_printValue((long)millis() * 1000, 0);
     } else if (this->mode == ascent) {
         if (this->telemetry->altitude < 3000) {
-            this->_printValue(1, 0);
+            this->_printValue(this->telemetry->altitude, 0);
+        } else if (this->telemetry->apoapsis < 70000) {
+            this->_printValue(this->telemetry->apoapsis, 0);
         } else {
-            this->_printValue(2, 0);
+            this->_printValue(this->telemetry->verticalSpeed, 0);
         }
     }
 }

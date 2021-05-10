@@ -92,7 +92,7 @@ void Controller::init()
   pinMode(inputInterruptPin, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(inputInterruptPin), readButtons, CHANGE);
 
-  this->leds.init(pinLedData, pinLedClock, pinLedLoad, &this->telemetry);
+  //this->leds.init(pinLedData, pinLedClock, pinLedLoad, &this->telemetry);
   this->seg7.init(&this->telemetry);
   this->display.init(&this->telemetry);
   strcpy(this->display.debug_str, "controller ready");

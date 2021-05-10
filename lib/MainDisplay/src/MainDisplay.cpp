@@ -27,7 +27,6 @@ void MainDisplay::setMode(Mode mode)
         return;
     }
     char leftArrow = 127;
-    char rightArrow = 126;
     this->mode = mode;
     this->lcd.clear();
 

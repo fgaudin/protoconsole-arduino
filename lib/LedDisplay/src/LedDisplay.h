@@ -1,16 +1,16 @@
 #pragma once
 
 #include <Arduino.h>
-#include <Telemetry.h>
 #include <LedControl.h>
+#include <Telemetry.h>
 
 class LedDisplay {
     private:
         int pinData;
         int pinClock;
         int pinLoad;
-        Telemetry* telemetry;
         LedControl ledCtrl;
+        Telemetry* telemetry;
 
     public:
         LedDisplay();

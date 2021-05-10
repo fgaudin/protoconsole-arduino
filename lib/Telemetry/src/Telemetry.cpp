@@ -31,3 +31,14 @@ Telemetry::Telemetry() {
   this->verticalSpeed =  0.0;
   this->horizontalSpeed =  0.0;
 }
+
+void Telemetry::update(char id, byte* data) {
+  if (id == 'f') {  // flags
+    this->sas = (bool) (data[1] & 1);
+    this->rcs = (bool) (data[1] & (1 << 1));
+    this->lights = (bool) (data[1] & (1 << 2));
+    this->brake = (bool) (data[1] & (1 << 3));
+    this->contact = (bool) (data[1] & (1 << 4));
+    this->dot05g = (bool) (data[1] & (1 << 5));
+  }
+}

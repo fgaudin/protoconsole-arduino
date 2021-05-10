@@ -41,4 +41,5 @@ class Telemetry {
         long horizontalSpeed;
 
         Telemetry();
+        void update(char id, byte* data);
 };
