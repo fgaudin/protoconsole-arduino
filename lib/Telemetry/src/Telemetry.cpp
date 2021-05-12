@@ -10,6 +10,7 @@ Telemetry::Telemetry() {
   this->brake = false;
   this->engine = false;
   this->antenna = false;
+  this->stage = false;
 
   this->twr = 0.0;
   this->q = 0.0;
@@ -34,11 +35,17 @@ Telemetry::Telemetry() {
 
 void Telemetry::update(char id, byte* data) {
   if (id == 'f') {  // flags
-    this->sas = (bool) (data[1] & 1);
-    this->rcs = (bool) (data[1] & (1 << 1));
-    this->lights = (bool) (data[1] & (1 << 2));
-    this->brake = (bool) (data[1] & (1 << 3));
-    this->contact = (bool) (data[1] & (1 << 4));
-    this->dot05g = (bool) (data[1] & (1 << 5));
+    this->sas = (bool) (data[0] & 1);
+    this->rcs = (bool) (data[0] & (1 << 1));
+    this->lights = (bool) (data[0] & (1 << 2));
+    this->brake = (bool) (data[0] & (1 << 3));
+    this->contact = (bool) (data[0] & (1 << 4));
+    this->dot05g = (bool) (data[0] & (1 << 5));
+    this->docked = (bool) (data[0] & (1 << 6));
+    this->stage = (bool) (data[0] & (1 << 7));
+  } else if (id == 'g') {  // 2 bits flags
+    this->solarPanel = (int) data[0] & B11;
+    this->gear = (int) (data[0] >> 2) & B11;
+    this->antenna = (int) (data[0] >> 4) & B11;
   }
 }

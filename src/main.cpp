@@ -35,6 +35,7 @@ void setup()
 
   // data link
   Serial.begin(57600);
+  Serial.print("!");
 
   // leds
   leds.init(pinLedData, pinLedClock, pinLedLoad, &telemetry);
@@ -93,8 +94,13 @@ void handle_packet(char * packet) {
   SerialDebug.println(packet);
   #endif
 
-  if (packet[0] == 'f') {  // flags for leds
-    expected_size = 4;
+  switch (packet[0]) {
+    case 'f':  // 1 bit flags for leds
+      expected_size = 2;
+      break;
+    case 'g':  // 2 bits flags for leds
+      expected_size = 2;
+      break;
   }
   if (payload_size != expected_size) {
     #ifdef DEBUG
@@ -113,7 +119,6 @@ void handle_packet(char * packet) {
   }
 
   telemetry.update(packet[0], payload);
-  leds.refresh();
 }
 
 void loop() {
@@ -144,4 +149,6 @@ void loop() {
       }
     }
   }
+
+  leds.refresh();
 }
