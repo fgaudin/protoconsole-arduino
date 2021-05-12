@@ -47,5 +47,17 @@ void Telemetry::update(char id, byte* data) {
     this->solarPanel = (int) data[0] & B11;
     this->gear = (int) (data[0] >> 2) & B11;
     this->antenna = (int) (data[0] >> 4) & B11;
+  } else if (id == 'u') {  // fuel bytes
+    this->stageFuel = (int) data[0];
+    this->stageOx = (int) data[1];
+    this->stageMonoprop = (int) data[2];
+    this->stageElec = (int) data[3];
+    this->stageXenon = (int) data[4];
+  } else if (id == 'l') {  // fuel bytes
+    this->stageO2 = (int) data[0];
+    this->stageH2O = (int) data[1];
+    this->stageFood = (int) data[2];
+    this->stageCO2 = (int) data[3];
+    this->stageWaste = (int) data[4];
   }
 }
