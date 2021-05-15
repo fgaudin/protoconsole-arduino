@@ -31,6 +31,8 @@ class Telemetry {
         int stageCO2;
         int stageWaste;
 
+        long met;
+
         char altitude[6] = "#";
         char periapsis[6] = "#";
         char apoapsis[6] = "#";

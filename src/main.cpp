@@ -4,6 +4,7 @@
 #include <Telemetry.h>
 #include <BarGraph.h>
 #include <MainDisplay.h>
+#include <SevenSegment.h>
 
 #define DEBUG 1
 #define TEST 0
@@ -30,6 +31,7 @@ Telemetry telemetry;
 LedDisplay leds;
 BarGraph bars;
 MainDisplay display;
+SevenSegment seg7;
 
 void setup()
 {
@@ -51,6 +53,9 @@ void setup()
   strcpy(display.debug_str, "controller ready");
   display.setMode(ascent);
   display.refresh();
+
+  // 7 segments
+  seg7.init(&telemetry);
 }
 
 void handle_packet(char * packet) {
@@ -85,6 +90,10 @@ void handle_packet(char * packet) {
       byte_payload = true;
       refresh_bars = true;
       bars.setMode(lifesupport);
+      break;
+    case 'm':  // Mission Elapsed Time
+      expected_size = 3;
+      byte_payload = true;
       break;
     case 'a':  // apoapsis
       refresh_display = true;
@@ -170,4 +179,5 @@ void loop() {
   }
 
   leds.refresh();
+  seg7.refresh();
 }

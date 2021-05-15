@@ -9,6 +9,9 @@ class SevenSegment {
         Telemetry* telemetry;
         LedControl ledCtrl;
         Mode mode;
+        long lastValue;
+        long lastMetValue;
+        long lastMetUpdate;
 
     public:
         SevenSegment();
@@ -16,5 +19,6 @@ class SevenSegment {
         void test();
         void refresh();
         void _printValue(float value, int decimals);
+        void _printMET(long value);
         void setMode(Mode mode);
 };
