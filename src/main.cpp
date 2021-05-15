@@ -91,10 +91,6 @@ void handle_packet(char * packet) {
       refresh_bars = true;
       bars.setMode(lifesupport);
       break;
-    case 'm':  // Mission Elapsed Time
-      expected_size = 3;
-      byte_payload = true;
-      break;
     case 'a':  // apoapsis
       refresh_display = true;
       break;
@@ -118,6 +114,10 @@ void handle_packet(char * packet) {
       break;
     case 't':  // twr
       refresh_display = true;
+      break;
+    case 'm':  // Mission Elapsed Time
+      expected_size = 3;
+      byte_payload = true;
       break;
   }
 
@@ -151,7 +151,12 @@ void handle_packet(char * packet) {
   telemetry.update(packet[0], payload);
 
   if (refresh_bars) bars.refresh();
-  if (refresh_display) display.refresh();
+  if (refresh_display) {
+    #ifdef DEBUG
+    SerialDebug.println("refreshing display");
+    #endif
+    display.refresh();
+  }
 }
 
 void loop() {
