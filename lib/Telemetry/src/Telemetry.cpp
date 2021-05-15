@@ -12,9 +12,6 @@ Telemetry::Telemetry() {
   this->antenna = false;
   this->stage = false;
 
-  this->twr = 0.0;
-  this->q = 0.0;
-  this->pitch = 0;
   this->stageFuel = 0;
   this->stageOx = 0;
   this->stageMonoprop = 0;
@@ -25,12 +22,6 @@ Telemetry::Telemetry() {
   this->stageFood = 0;
   this->stageCO2 = 0;
   this->stageWaste = 0;
-
-  this->altitude = 0.0;
-  this->periapsis = 0.0;
-  this->apoapsis =  0.0;
-  this->verticalSpeed =  0.0;
-  this->horizontalSpeed =  0.0;
 }
 
 void Telemetry::update(char id, byte* data) {
@@ -53,11 +44,27 @@ void Telemetry::update(char id, byte* data) {
     this->stageMonoprop = (int) data[2];
     this->stageElec = (int) data[3];
     this->stageXenon = (int) data[4];
-  } else if (id == 'l') {  // fuel bytes
+  } else if (id == 'l') {  // life support bytes
     this->stageO2 = (int) data[0];
     this->stageH2O = (int) data[1];
     this->stageFood = (int) data[2];
     this->stageCO2 = (int) data[3];
     this->stageWaste = (int) data[4];
+  } else if (id == 'a') {
+    strcpy(this->apoapsis, (char *) data);
+  } else if (id == 'p') {
+    strcpy(this->periapsis, (char *) data);
+  } else if (id == 'v') {
+    strcpy(this->verticalSpeed, (char *) data);
+  } else if (id == 'h') {
+    strcpy(this->horizontalSpeed, (char *) data);
+  } else if (id == 'A') {
+    strcpy(this->altitude, (char *) data);
+  } else if (id == 'P') {
+    strcpy(this->pitch, (char *) data);
+  } else if (id == 'Q') {
+    strcpy(this->q, (char *) data);
+  } else if (id == 't') {
+    strcpy(this->twr, (char *) data);
   }
 }

@@ -77,54 +77,37 @@ void MainDisplay::refresh()
         int colLeft = 1;
         int colRight = 10;
         
-        char data[8];
-
-        memset(data, 0, 8);
         this->lcd.setCursor(colLeft+3, 0);
-        metricfy(this->telemetry->apoapsis, data);
-        padLeft(' ', data, 5);
-        this->lcd.print(data);
+        padLeft(' ', this->telemetry->apoapsis, 5);
+        this->lcd.print(this->telemetry->apoapsis);
 
-        memset(data, 0, 8);
         this->lcd.setCursor(colLeft+3, 1);
-        metricfy(this->telemetry->periapsis, data);
-        padLeft(' ', data, 5);
-        this->lcd.print(data);
+        padLeft(' ', this->telemetry->periapsis, 5);
+        this->lcd.print(this->telemetry->periapsis);
 
-        memset(data, 0, 8);
         this->lcd.setCursor(colLeft+3, 2);
-        metricfy(this->telemetry->verticalSpeed , data);
-        padLeft(' ', data, 5);
-        this->lcd.print(data);
+        padLeft(' ', this->telemetry->verticalSpeed, 5);
+        this->lcd.print(this->telemetry->verticalSpeed);
 
-        memset(data, 0, 8);
         this->lcd.setCursor(colLeft+3, 3);
-        metricfy(this->telemetry->horizontalSpeed , data);
-        padLeft(' ', data, 5);
-        this->lcd.print(data);
+        padLeft(' ', this->telemetry->horizontalSpeed, 5);
+        this->lcd.print(this->telemetry->horizontalSpeed);
 
-        memset(data, 0, 8);
         this->lcd.setCursor(colRight+4, 0);
-        metricfy(this->telemetry->altitude, data);
-        padLeft(' ', data, 5);
-        this->lcd.print(data);
+        padLeft(' ', this->telemetry->altitude, 5);
+        this->lcd.print(this->telemetry->altitude);
 
-        memset(data, 0, 8);
         this->lcd.setCursor(colRight+4, 1);
-        dtostrf(this->telemetry->twr, 5, 1, data);
-        this->lcd.print(data);
+        padLeft(' ', this->telemetry->twr, 5);
+        this->lcd.print(this->telemetry->twr);
 
-        memset(data, 0, 8);
         this->lcd.setCursor(colRight+4, 2);
-        ltoa(this->telemetry->pitch, data, 10);
-        padLeft(' ', data, 5);
-        this->lcd.print(data);
+        padLeft(' ', this->telemetry->pitch, 5);
+        this->lcd.print(this->telemetry->pitch);
 
-        memset(data, 0, 8);
         this->lcd.setCursor(colRight+4, 3);
-        metricfy(this->telemetry->q, data);
-        padLeft(' ', data, 5);
-        this->lcd.print(data);
+        padLeft(' ', this->telemetry->q, 5);
+        this->lcd.print(this->telemetry->q);
     }
 }
 

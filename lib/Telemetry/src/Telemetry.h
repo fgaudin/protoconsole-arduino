@@ -20,9 +20,6 @@ class Telemetry {
         bool master_alarm;
         bool stage;
 
-        float twr;
-        float q;
-        int pitch;
         int stageFuel;
         int stageOx;
         int stageMonoprop;
@@ -34,11 +31,14 @@ class Telemetry {
         int stageCO2;
         int stageWaste;
 
-        long altitude;
-        long periapsis;
-        long apoapsis;
-        long verticalSpeed;
-        long horizontalSpeed;
+        char altitude[6] = "#";
+        char periapsis[6] = "#";
+        char apoapsis[6] = "#";
+        char verticalSpeed[6] = "#";
+        char horizontalSpeed[6] = "#";
+        char pitch[6] = "#";
+        char q[6] = "#";
+        char twr[6] = "#";
 
         Telemetry();
         void update(char id, byte* data);
