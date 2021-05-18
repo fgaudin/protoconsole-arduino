@@ -9,12 +9,12 @@ SevenSegment::SevenSegment() :
 void SevenSegment::init(Telemetry* telemetry)
 {
     this->lastMetUpdate = 0;
-    this->lastMetValue = 0;
+    this->lastMetValue = -1;
     this->lastValue = 0;
     this->telemetry = telemetry;
 
     this->ledCtrl.shutdown(0,false);
-    this->ledCtrl.setIntensity(0,1);
+    this->ledCtrl.setIntensity(0,6);
     this->ledCtrl.clearDisplay(0);
 }
 
@@ -30,14 +30,13 @@ void SevenSegment::test() {
     this->ledCtrl.clearDisplay(0);
 }
 
-void SevenSegment::_printMET(long value) {
-    uint8_t seconds = value % 60;
-    uint8_t minutes = ((int)floor(value / 60)) % 60;
-    uint16_t hours = floor(value / 3600);
+void SevenSegment::_printMET(unsigned long value) {
+    uint8_t seconds = (uint8_t) (value % 60);
+    uint8_t minutes = (uint8_t)(value / 60 % 60);
+    uint16_t hours = (uint16_t) (value / 3600);
 
     char string[5] = "\0\0\0\0";
 
-    this->ledCtrl.clearDisplay(0);
     sprintf(string, "%02d", seconds);
     this->ledCtrl.setChar(0, 0, string[1], false);
     this->ledCtrl.setChar(0, 1, string[0], false);

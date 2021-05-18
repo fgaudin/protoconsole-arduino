@@ -126,7 +126,7 @@ void handle_packet(char * packet) {
   } else {
     payload_size = strlen(packet) + 1;
   }
-
+  
   if (byte_payload && payload_size != expected_size) {
     #ifdef DEBUG
     SerialDebug.println("packet size incorrect");
@@ -135,7 +135,7 @@ void handle_packet(char * packet) {
   }
   
   byte payload[(int)(payload_size)] = {0};
-
+  
   if (byte_payload) {
     for(int i=0; i<payload_size;++i) {
       char c = packet[2*i+2];
@@ -147,14 +147,16 @@ void handle_packet(char * packet) {
     strncpy((char *)payload, &(packet[2]), payload_size - 1);
     payload[payload_size] = '\0';
   }
-
+  
   telemetry.update(packet[0], payload);
+  
+  if (refresh_bars) {
+    bars.refresh();
+  }
 
-  if (refresh_bars) bars.refresh();
+  //SerialDebug.println(refresh_display);
   if (refresh_display) {
-    #ifdef DEBUG
     SerialDebug.println("refreshing display");
-    #endif
     display.refresh();
   }
 }
@@ -184,5 +186,6 @@ void loop() {
   }
 
   leds.refresh();
+  display.update();
   seg7.refresh();
 }

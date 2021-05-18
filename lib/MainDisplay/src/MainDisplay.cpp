@@ -4,6 +4,8 @@
 MainDisplay::MainDisplay() : lcd(0x27)
 {
     this->mode = debug;
+    this->needsUpdate = false;
+    this->lastUpdate = 0;
 }
 
 void MainDisplay::init(Telemetry* telemetry)
@@ -14,10 +16,6 @@ void MainDisplay::init(Telemetry* telemetry)
     this->lcd.home();
     this->lcd.clear();
     this->lcd.print("Display initialized");
-    delay(500);
-    this->lcd.home();
-    this->lcd.clear();
-    this->lcd.print("Ready");
     delay(500);
 }
 
@@ -52,9 +50,9 @@ void MainDisplay::setMode(Mode mode)
         this->lcd.setCursor(colRight, row++);
         this->lcd.print("TWR:00000");
         this->lcd.setCursor(colRight, row++);
-        this->lcd.print("Pch:0000");
+        this->lcd.print("Pch:00000");
         this->lcd.setCursor(colRight, row++);
-        this->lcd.print("  Q:0000");
+        this->lcd.print("  Q:00000");
     } else if (this->mode == orbit) {
         this->lcd.setCursor(0, 1);
         this->lcd.print(leftArrow);
@@ -69,6 +67,15 @@ void MainDisplay::setMode(Mode mode)
 
 void MainDisplay::refresh()
 {
+    this->needsUpdate = true;
+}
+
+void MainDisplay::update()
+{
+    if (!this->needsUpdate) return;
+
+    if (millis() - this->lastUpdate < 50) return;
+
     if (this->mode == debug) {
         this->lcd.home();
         this->lcd.clear();
@@ -109,6 +116,7 @@ void MainDisplay::refresh()
         padLeft(' ', this->telemetry->q, 5);
         this->lcd.print(this->telemetry->q);
     }
+    this->lastUpdate = millis();
 }
 
 void MainDisplay::print(const char* str)

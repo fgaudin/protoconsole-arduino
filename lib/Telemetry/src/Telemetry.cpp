@@ -53,7 +53,7 @@ void Telemetry::update(char id, byte* data) {
     this->stageCO2 = (int) data[3];
     this->stageWaste = (int) data[4];
   } else if (id == 'm') {
-    this->met = data[0] << 16 | data[1] << 8 | data[2];
+    this->met = ((long) data[0] << 16) | (data[1] << 8) | data[2];
   } else if (id == 'a') {
     strcpy(this->apoapsis, (char *) data);
   } else if (id == 'p') {

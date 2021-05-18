@@ -9,14 +9,14 @@ class SevenSegment {
         Telemetry* telemetry;
         LedControl ledCtrl;
         Mode mode;
-        uint32_t lastValue;
-        uint32_t lastMetValue;
-        long lastMetUpdate;
+        unsigned long lastValue;
+        unsigned long lastMetValue;
+        unsigned long lastMetUpdate;
 
     public:
         SevenSegment();
         void init(Telemetry* telemetry);
         void test();
         void refresh();
-        void _printMET(long value);
+        void _printMET(unsigned long value);
 };
