@@ -6,8 +6,8 @@ enum Mode {debug, ascent, orbit, descent, docking};
 
 class Telemetry {
     public:
-        int solarPanel;
-        int gear;
+        bool solarPanel;
+        bool gear;
         bool docked;
         bool lights;
         bool sas;
@@ -33,7 +33,7 @@ class Telemetry {
 
         unsigned long met;
 
-        char altitude[6] = "#";
+        float altitude;
         char periapsis[6] = "#";
         char apoapsis[6] = "#";
         char verticalSpeed[6] = "#";

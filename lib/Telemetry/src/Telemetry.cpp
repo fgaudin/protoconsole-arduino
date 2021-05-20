@@ -62,8 +62,6 @@ void Telemetry::update(char id, byte* data) {
     strcpy(this->verticalSpeed, (char *) data);
   } else if (id == 'h') {
     strcpy(this->horizontalSpeed, (char *) data);
-  } else if (id == 'A') {
-    strcpy(this->altitude, (char *) data);
   } else if (id == 'P') {
     strcpy(this->pitch, (char *) data);
   } else if (id == 'Q') {

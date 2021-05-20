@@ -33,7 +33,7 @@ void metricfy(long value, char * buffer)
     } else if (abs(value) >= 1000000) {
         unit = 'M';
         value = value / 1000;
-    } else if (abs(value) >= 1000) {
+    } else if (abs(value) >= 10000) {
         unit = 'k';
         value = value / 1000;
     }

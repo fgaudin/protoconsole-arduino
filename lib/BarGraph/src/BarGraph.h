@@ -11,6 +11,7 @@ class BarGraph {
         int pinData;
         int pinClock;
         int pinLoad;
+        unsigned long lastUpdate;
         Telemetry* telemetry;
         LedControl ledCtrl;
         int bar[5] = {10, 10, 10, 10, 10};

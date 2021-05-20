@@ -74,7 +74,7 @@ void MainDisplay::update()
 {
     if (!this->needsUpdate) return;
 
-    if (millis() - this->lastUpdate < 50) return;
+    if (millis() - this->lastUpdate < 300) return;
 
     if (this->mode == debug) {
         this->lcd.home();
@@ -84,6 +84,8 @@ void MainDisplay::update()
         int colLeft = 1;
         int colRight = 10;
         
+        char data[6];
+
         this->lcd.setCursor(colLeft+3, 0);
         padLeft(' ', this->telemetry->apoapsis, 5);
         this->lcd.print(this->telemetry->apoapsis);
@@ -100,9 +102,11 @@ void MainDisplay::update()
         padLeft(' ', this->telemetry->horizontalSpeed, 5);
         this->lcd.print(this->telemetry->horizontalSpeed);
 
+        memset(data, 0, 6);
+        metricfy((long) round(this->telemetry->altitude), data);
+        padLeft(' ', data, 5);
         this->lcd.setCursor(colRight+4, 0);
-        padLeft(' ', this->telemetry->altitude, 5);
-        this->lcd.print(this->telemetry->altitude);
+        this->lcd.print(data);
 
         this->lcd.setCursor(colRight+4, 1);
         padLeft(' ', this->telemetry->twr, 5);
@@ -117,6 +121,7 @@ void MainDisplay::update()
         this->lcd.print(this->telemetry->q);
     }
     this->lastUpdate = millis();
+    this->needsUpdate = false;
 }
 
 void MainDisplay::print(const char* str)

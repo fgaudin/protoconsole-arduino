@@ -5,6 +5,8 @@
 #include <BarGraph.h>
 #include <MainDisplay.h>
 #include <SevenSegment.h>
+#include <KerbalSimpit.h>
+#include <Utils.h>
 
 #define DEBUG 1
 #define TEST 0
@@ -21,11 +23,7 @@ const int pinBarData = 8;
 const int pinBarClock = 9;
 const int pinBarLoad = 10;
 
-SoftwareSerial SerialDebug(pinDebugRx, pinDebugTx); // RX, TX
-
-uint8_t read = 0;
-const uint8_t max_packet_size = 128;
-char received[max_packet_size] = "";
+KerbalSimpit mySimpit(Serial);
 
 Telemetry telemetry;
 LedDisplay leds;
@@ -33,16 +31,26 @@ BarGraph bars;
 MainDisplay display;
 SevenSegment seg7;
 
+void messageHandler(byte messageType, byte msg[], byte msgSize);
+
 void setup()
 {
-  #ifdef DEBUG
-  SerialDebug.begin(38400);
-  SerialDebug.println("Starting up");
-  #endif
+  Serial.begin(115200);
 
-  // data link
-  Serial.begin(57600);
-  Serial.print("!");
+  while (!mySimpit.init()) {
+    delay(100);
+  }
+  mySimpit.printToKSP("Connected", PRINT_TO_SCREEN);
+
+  mySimpit.inboundHandler(messageHandler);
+  mySimpit.registerChannel(ALTITUDE_MESSAGE);
+  mySimpit.registerChannel(ACTIONSTATUS_MESSAGE);
+  mySimpit.registerChannel(LF_STAGE_MESSAGE);
+  mySimpit.registerChannel(OX_STAGE_MESSAGE);
+  mySimpit.registerChannel(XENON_GAS_STAGE_MESSAGE);
+  mySimpit.registerChannel(MONO_MESSAGE);
+  mySimpit.registerChannel(ELECTRIC_MESSAGE);
+  mySimpit.registerChannel(FLIGHT_STATUS_MESSAGE);
 
   // leds
   leds.init(pinLedData, pinLedClock, pinLedLoad, &telemetry);
@@ -56,136 +64,68 @@ void setup()
 
   // 7 segments
   seg7.init(&telemetry);
-}
 
-void handle_packet(char * packet) {
-  uint8_t expected_size = 0;
-  uint8_t payload_size;
-
-  #ifdef DEBUG
-  SerialDebug.println(packet);
-  #endif
-
-  bool byte_payload = false;
-  bool refresh_bars = false;
-  bool refresh_display = false;
-
-  switch (packet[0]) {
-    case 'f':  // 1 bit flags for leds
-      expected_size = 1;  // in bytes, since hexa FF = 1 byte
-      byte_payload = true;
-      break;
-    case 'g':  // 2 bits flags for leds
-      expected_size = 1;
-      byte_payload = true;
-      break;
-    case 'u':  // fuels
-      expected_size = 5;
-      byte_payload = true;
-      refresh_bars = true;
-      bars.setMode(fuel);
-      break;
-    case 'l':  // life support
-      expected_size = 5;
-      byte_payload = true;
-      refresh_bars = true;
-      bars.setMode(lifesupport);
-      break;
-    case 'a':  // apoapsis
-      refresh_display = true;
-      break;
-    case 'p':  // periapsis
-      refresh_display = true;
-      break;
-    case 'v':  // vertical speed
-      refresh_display = true;
-      break;
-    case 'h':  // horizontal speed
-      refresh_display = true;
-      break;
-    case 'A':  // altitude
-      refresh_display = true;
-      break;
-    case 'P':  // pitch
-      refresh_display = true;
-      break;
-    case 'Q':  // dynamic pressure
-      refresh_display = true;
-      break;
-    case 't':  // twr
-      refresh_display = true;
-      break;
-    case 'm':  // Mission Elapsed Time
-      expected_size = 3;
-      byte_payload = true;
-      break;
-  }
-
-  if (byte_payload) {
-    payload_size = (strlen(packet) - 2)/2;
-  } else {
-    payload_size = strlen(packet) + 1;
-  }
-  
-  if (byte_payload && payload_size != expected_size) {
-    #ifdef DEBUG
-    SerialDebug.println("packet size incorrect");
-    #endif
-    return;
-  }
-  
-  byte payload[(int)(payload_size)] = {0};
-  
-  if (byte_payload) {
-    for(int i=0; i<payload_size;++i) {
-      char c = packet[2*i+2];
-      payload[i] = ((c >= 'A') ? c - 'A' + 10 : c - '0') << 4;
-      c = packet[2*i+3];
-      payload[i] |= (c >= 'A') ? c - 'A' + 10 : c - '0';
-    }
-  } else {
-    strncpy((char *)payload, &(packet[2]), payload_size - 1);
-    payload[payload_size] = '\0';
-  }
-  
-  telemetry.update(packet[0], payload);
-  
-  if (refresh_bars) {
-    bars.refresh();
-  }
-
-  //SerialDebug.println(refresh_display);
-  if (refresh_display) {
-    SerialDebug.println("refreshing display");
-    display.refresh();
-  }
+  // bars
+  bars.init(pinBarData, pinBarClock, pinBarLoad, &telemetry);
+  bars.setMode(fuel);
 }
 
 void loop() {
-  char c = 0;
-
-  if(Serial.available() > 0) {
-    c = Serial.read();
-    if (c == '[') {
-      read = 0;
-      received[0] = '\0';
-    } else if (c == ']') {
-      received[read] = '\0';
-      read = 0;
-      handle_packet(received);
-    } else {
-      if (read >= max_packet_size) {
-        #ifdef DEBUG
-          SerialDebug.println("packet too long");
-        #endif
-      } else {
-        received[read] = c;
-        read++;
-      }
-    }
-  }
-
+  mySimpit.update();
   leds.refresh();
   display.update();
   seg7.refresh();
+  bars.refresh();
+}
+
+void messageHandler(byte messageType, byte msg[], byte msgSize) {
+  switch(messageType) {
+    case ALTITUDE_MESSAGE:
+      if (msgSize == sizeof(altitudeMessage)) {
+        altitudeMessage myAltitude = parseAltitude(msg);
+        if (telemetry.altitude != myAltitude.sealevel) {
+          telemetry.altitude = myAltitude.sealevel;
+          mySimpit.printToKSP("refresh");
+          display.refresh();
+        }
+      }
+    break;
+    case ACTIONSTATUS_MESSAGE:
+      if (msgSize == sizeof(byte)) {
+        telemetry.sas = (bool) (msg[0] & SAS_ACTION);
+        if (telemetry.sas) {
+          mySimpit.printToKSP("SAS ON");
+        } else {
+          mySimpit.printToKSP("SAS OFF");
+        }
+        telemetry.lights = (bool) (msg[0] & LIGHT_ACTION);
+        telemetry.rcs = (bool) (msg[0] & RCS_ACTION);
+        telemetry.gear = (bool) (msg[0] & GEAR_ACTION);
+        telemetry.brake = (bool) (msg[0] & BRAKES_ACTION);
+      } else {
+        mySimpit.printToKSP("wrong message size", VERBOSE_ONLY);
+      }
+    break;
+    case LF_STAGE_MESSAGE:
+    case OX_STAGE_MESSAGE:
+    case XENON_GAS_STAGE_MESSAGE:
+    case MONO_MESSAGE:
+    case ELECTRIC_MESSAGE:
+      if (msgSize == sizeof(resourceMessage)) {
+        resourceMessage resource = parseResource(msg);
+        int value = (int) round(10 * resource.available / resource.total);
+        if (messageType == LF_STAGE_MESSAGE) telemetry.stageFuel = value;
+        if (messageType == OX_STAGE_MESSAGE) telemetry.stageOx = value;
+        if (messageType == XENON_GAS_STAGE_MESSAGE) telemetry.stageXenon = value;
+        if (messageType == MONO_MESSAGE) telemetry.stageMonoprop = value;
+        if (messageType == ELECTRIC_MESSAGE) telemetry.stageElec = value;
+      }
+    break;
+    case FLIGHT_STATUS_MESSAGE:
+      if (msgSize == sizeof(flightStatusMessage)) {
+        flightStatusMessage flight = parseFlightStatusMessage(msg);
+        telemetry.contact = (flight.vesselSituation <= 4);  // Landed: 1, splashed: 2, pre-launch: 4, flying: 8
+      }
+    break;
+  }
 }

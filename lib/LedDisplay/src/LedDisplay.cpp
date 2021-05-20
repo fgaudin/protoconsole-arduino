@@ -70,42 +70,20 @@ void LedDisplay::_blink(int led) {
 
 void LedDisplay::refresh()
 {
-    switch (this->telemetry->solarPanel) {
-        case 3:
-            this->_on(LED_SOLAR_ON);
-            this->_off(LED_SOLAR_OFF);
-            break;
-        case 2:
-            this->_off(LED_SOLAR_OFF);
-            this->_blink(LED_SOLAR_ON);
-            break;
-        case 1:
-            this->_blink(LED_SOLAR_OFF);
-            this->_off(LED_SOLAR_ON);
-            break;
-        case 0:
-            this->_on(LED_SOLAR_OFF);
-            this->_off(LED_SOLAR_ON);
-            break;
+    if (this->telemetry->solarPanel) {
+        this->_on(LED_SOLAR_ON);
+        this->_off(LED_SOLAR_OFF);
+    } else {
+        this->_on(LED_SOLAR_OFF);
+        this->_off(LED_SOLAR_ON);
     }
 
-    switch (this->telemetry->gear) {
-        case 3:
-            this->_on(LED_GEAR_ON);
-            this->_off(LED_GEAR_OFF);
-            break;
-        case 2:
-            this->_off(LED_GEAR_OFF);
-            this->_blink(LED_GEAR_ON);
-            break;
-        case 1:
-            this->_blink(LED_GEAR_OFF);
-            this->_off(LED_GEAR_ON);
-            break;
-        case 0:
-            this->_on(LED_GEAR_OFF);
-            this->_off(LED_GEAR_ON);
-            break;
+    if (this->telemetry->gear) {
+        this->_on(LED_GEAR_ON);
+        this->_off(LED_GEAR_OFF);
+    } else {
+        this->_on(LED_GEAR_OFF);
+        this->_off(LED_GEAR_ON);
     }
 
     switch (this->telemetry->antenna) {
