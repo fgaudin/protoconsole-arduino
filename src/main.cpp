@@ -51,6 +51,7 @@ void setup()
   mySimpit.registerChannel(MONO_MESSAGE);
   mySimpit.registerChannel(ELECTRIC_MESSAGE);
   mySimpit.registerChannel(FLIGHT_STATUS_MESSAGE);
+  mySimpit.registerChannel(CAGSTATUS_MESSAGE);
 
   // leds
   leds.init(pinLedData, pinLedClock, pinLedLoad, &telemetry);
@@ -83,7 +84,7 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
     case ALTITUDE_MESSAGE:
       if (msgSize == sizeof(altitudeMessage)) {
         altitudeMessage myAltitude = parseAltitude(msg);
-        if (telemetry.altitude != myAltitude.sealevel) {
+        if (round(telemetry.altitude) != round(myAltitude.sealevel)) {
           telemetry.altitude = myAltitude.sealevel;
           mySimpit.printToKSP("refresh");
           display.refresh();
@@ -125,6 +126,14 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
       if (msgSize == sizeof(flightStatusMessage)) {
         flightStatusMessage flight = parseFlightStatusMessage(msg);
         telemetry.contact = (flight.vesselSituation <= 4);  // Landed: 1, splashed: 2, pre-launch: 4, flying: 8
+        telemetry.antenna = (int) ceil(3.0 * flight.commNetSignalStrenghPercentage / 100.0);
+      }
+    break;
+    case CAGSTATUS_MESSAGE:
+      if (msgSize == sizeof(cagStatusMessage)) {
+        cagStatusMessage status = parseCAGStatusMessage(msg);
+        telemetry.solarPanel = status.is_action_activated(1);
+        telemetry.stage = status.is_action_activated(2);
       }
     break;
   }
