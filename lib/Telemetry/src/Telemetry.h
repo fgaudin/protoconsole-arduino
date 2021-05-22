@@ -34,14 +34,13 @@ class Telemetry {
         unsigned long met;
 
         float altitude;
-        char periapsis[6] = "#";
-        char apoapsis[6] = "#";
-        char verticalSpeed[6] = "#";
-        char horizontalSpeed[6] = "#";
-        char pitch[6] = "#";
+        float periapsis;
+        float apoapsis;
+        float verticalSpeed;
+        float orbitalSpeed;
+        int16_t pitch;
         char q[6] = "#";
         char twr[6] = "#";
 
         Telemetry();
-        void update(char id, byte* data);
 };

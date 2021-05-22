@@ -52,6 +52,8 @@ void setup()
   mySimpit.registerChannel(ELECTRIC_MESSAGE);
   mySimpit.registerChannel(FLIGHT_STATUS_MESSAGE);
   mySimpit.registerChannel(CAGSTATUS_MESSAGE);
+  mySimpit.registerChannel(APSIDES_MESSAGE);
+  mySimpit.registerChannel(VELOCITY_MESSAGE);
 
   // leds
   leds.init(pinLedData, pinLedClock, pinLedLoad, &telemetry);
@@ -134,6 +136,42 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
         cagStatusMessage status = parseCAGStatusMessage(msg);
         telemetry.solarPanel = status.is_action_activated(1);
         telemetry.stage = status.is_action_activated(2);
+
+        int mode = 0;
+        if (status.is_action_activated(9)) {
+          mode += 1;
+        }
+        if (status.is_action_activated(10)) {
+          mode += 2;
+        }
+        switch(mode) {
+          case 0:
+            display.setMode(ascent);
+          break;
+          case 1:
+            display.setMode(orbit);
+          break;
+          case 2:
+            display.setMode(descent);
+          break;
+          case 3:
+            display.setMode(docking);
+          break;
+        }
+      }
+    break;
+    case APSIDES_MESSAGE:
+      if (msgSize == sizeof(apsidesMessage)) {
+        apsidesMessage apside = parseApsides(msg);
+        telemetry.apoapsis = apside.apoapsis;
+        telemetry.periapsis = apside.periapsis;
+      }
+    break;
+    case VELOCITY_MESSAGE:
+      if (msgSize == sizeof(velocityMessage)) {
+        velocityMessage velocity = parseVelocity(msg);
+        telemetry.verticalSpeed = velocity.vertical;
+        telemetry.orbitalSpeed = velocity.orbital;
       }
     break;
   }

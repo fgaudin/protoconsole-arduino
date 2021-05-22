@@ -24,6 +24,9 @@ void MainDisplay::setMode(Mode mode)
     if (mode == this->mode) {
         return;
     }
+
+    this->needsUpdate = true;
+
     char leftArrow = 127;
     this->mode = mode;
     this->lcd.clear();
@@ -43,7 +46,7 @@ void MainDisplay::setMode(Mode mode)
         this->lcd.setCursor(colLeft, row++);
         this->lcd.print("Vs:00000");
         this->lcd.setCursor(colLeft, row++);
-        this->lcd.print("Hs:00000");
+        this->lcd.print("Os:00000");
         row = 0;
         this->lcd.setCursor(colRight, row++);
         this->lcd.print("Alt:00000");
@@ -86,21 +89,30 @@ void MainDisplay::update()
         
         char data[6];
 
+        
+        memset(data, 0, 6);
+        metricfy((long) round(this->telemetry->apoapsis), data);
+        padLeft(' ', data, 5);
         this->lcd.setCursor(colLeft+3, 0);
-        padLeft(' ', this->telemetry->apoapsis, 5);
-        this->lcd.print(this->telemetry->apoapsis);
+        this->lcd.print(data);
 
+        memset(data, 0, 6);
+        metricfy((long) round(this->telemetry->periapsis), data);
+        padLeft(' ', data, 5);
         this->lcd.setCursor(colLeft+3, 1);
-        padLeft(' ', this->telemetry->periapsis, 5);
-        this->lcd.print(this->telemetry->periapsis);
-
+        this->lcd.print(data);
+        
+        memset(data, 0, 6);
+        metricfy((long) round(this->telemetry->verticalSpeed), data);
+        padLeft(' ', data, 5);
         this->lcd.setCursor(colLeft+3, 2);
-        padLeft(' ', this->telemetry->verticalSpeed, 5);
-        this->lcd.print(this->telemetry->verticalSpeed);
+        this->lcd.print(data);
 
+        memset(data, 0, 6);
+        metricfy((long) round(this->telemetry->orbitalSpeed), data);
+        padLeft(' ', data, 5);
         this->lcd.setCursor(colLeft+3, 3);
-        padLeft(' ', this->telemetry->horizontalSpeed, 5);
-        this->lcd.print(this->telemetry->horizontalSpeed);
+        this->lcd.print(data);
 
         memset(data, 0, 6);
         metricfy((long) round(this->telemetry->altitude), data);
@@ -112,9 +124,11 @@ void MainDisplay::update()
         padLeft(' ', this->telemetry->twr, 5);
         this->lcd.print(this->telemetry->twr);
 
+        memset(data, 0, 6);
+        itoa((int)round(this->telemetry->pitch), data, 10);
+        padLeft(' ', data, 5);
         this->lcd.setCursor(colRight+4, 2);
-        padLeft(' ', this->telemetry->pitch, 5);
-        this->lcd.print(this->telemetry->pitch);
+        this->lcd.print(data);
 
         this->lcd.setCursor(colRight+4, 3);
         padLeft(' ', this->telemetry->q, 5);
