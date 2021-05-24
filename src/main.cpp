@@ -37,6 +37,24 @@ void setup()
 {
   Serial.begin(115200);
 
+  // leds
+  leds.init(pinLedData, pinLedClock, pinLedLoad, &telemetry);
+  bars.init(pinBarData, pinBarClock, pinBarLoad, &telemetry);
+
+  // LCD
+  display.init(&telemetry);
+  strcpy(display.debug_str, "controller ready");
+  display.setMode(ascent);
+  display.refresh();
+
+  // 7 segments
+  seg7.init(&telemetry);
+
+  // bars
+  bars.init(pinBarData, pinBarClock, pinBarLoad, &telemetry);
+  bars.setMode(fuel);
+
+  // simpit
   while (!mySimpit.init()) {
     delay(100);
   }
@@ -54,23 +72,11 @@ void setup()
   mySimpit.registerChannel(CAGSTATUS_MESSAGE);
   mySimpit.registerChannel(APSIDES_MESSAGE);
   mySimpit.registerChannel(VELOCITY_MESSAGE);
-
-  // leds
-  leds.init(pinLedData, pinLedClock, pinLedLoad, &telemetry);
-  bars.init(pinBarData, pinBarClock, pinBarLoad, &telemetry);
-
-  // LCD
-  display.init(&telemetry);
-  strcpy(display.debug_str, "controller ready");
-  display.setMode(ascent);
-  display.refresh();
-
-  // 7 segments
-  seg7.init(&telemetry);
-
-  // bars
-  bars.init(pinBarData, pinBarClock, pinBarLoad, &telemetry);
-  bars.setMode(fuel);
+  mySimpit.registerChannel(TACLS_RESOURCE_MESSAGE);
+  mySimpit.registerChannel(TACLS_WASTE_MESSAGE);
+  mySimpit.registerChannel(APSIDESTIME_MESSAGE);
+  mySimpit.registerChannel(ORBIT_INFO);
+  mySimpit.registerChannel(MANEUVER_MESSAGE);
 }
 
 void loop() {
@@ -88,7 +94,6 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
         altitudeMessage myAltitude = parseAltitude(msg);
         if (round(telemetry.altitude) != round(myAltitude.sealevel)) {
           telemetry.altitude = myAltitude.sealevel;
-          mySimpit.printToKSP("refresh");
           display.refresh();
         }
       }
@@ -124,6 +129,21 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
         if (messageType == ELECTRIC_MESSAGE) telemetry.stageElec = value;
       }
     break;
+    case TACLS_RESOURCE_MESSAGE:
+      if (msgSize == sizeof(TACLSResourceMessage)) {
+        TACLSResourceMessage resource = parseTACLSResource(msg);
+        telemetry.stageFood = (int) round(10 * resource.currentFood / resource.maxFood);
+        telemetry.stageH2O = (int) round(10 * resource.currentWater / resource.maxWater);
+        telemetry.stageO2 = (int) round(10 * resource.currentOxygen / resource.maxOxygen);
+      }
+    break;
+    case TACLS_WASTE_MESSAGE:
+      if (msgSize == sizeof(TACLSWasteMessage)) {
+        TACLSWasteMessage resource = parseTACLSWaste(msg);
+        telemetry.stageWaste = (int) round(10 * resource.currentWaste / resource.maxWaste);
+        telemetry.stageCO2 = (int) round(10 * resource.currentCO2 / resource.maxCO2);
+      }
+    break;
     case FLIGHT_STATUS_MESSAGE:
       if (msgSize == sizeof(flightStatusMessage)) {
         flightStatusMessage flight = parseFlightStatusMessage(msg);
@@ -135,13 +155,18 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
       if (msgSize == sizeof(cagStatusMessage)) {
         cagStatusMessage status = parseCAGStatusMessage(msg);
         telemetry.solarPanel = status.is_action_activated(1);
-        telemetry.stage = status.is_action_activated(2);
+        telemetry.stage = status.is_action_activated(242);
+        if (status.is_action_activated(243)) {
+          bars.setMode(lifesupport);
+        } else {
+          bars.setMode(fuel);
+        }
 
         int mode = 0;
-        if (status.is_action_activated(9)) {
+        if (status.is_action_activated(240)) {
           mode += 1;
         }
-        if (status.is_action_activated(10)) {
+        if (status.is_action_activated(241)) {
           mode += 2;
         }
         switch(mode) {
@@ -173,6 +198,19 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
         telemetry.verticalSpeed = velocity.vertical;
         telemetry.orbitalSpeed = velocity.orbital;
       }
+    break;
+    case APSIDESTIME_MESSAGE:
+      if (msgSize == sizeof(apsidesTimeMessage)) {
+        apsidesTimeMessage times = parseApsidesTime(msg);
+        telemetry.apoapsisTime = times.apoapsis;
+        telemetry.periapsisTime = times.periapsis;
+      }
+    break;
+    case ORBIT_INFO:
+
+    break;
+    case MANEUVER_MESSAGE:
+
     break;
   }
 }

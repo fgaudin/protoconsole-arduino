@@ -59,6 +59,23 @@ void MainDisplay::setMode(Mode mode)
     } else if (this->mode == orbit) {
         this->lcd.setCursor(0, 1);
         this->lcd.print(leftArrow);
+        int row = 0;
+        int colLeft = 1;
+        int colRight = 10;
+        this->lcd.setCursor(colLeft, row++);
+        this->lcd.print("Ap:00000");
+        this->lcd.setCursor(colLeft, row++);
+        this->lcd.print("Pe:00000");
+        this->lcd.setCursor(colLeft, row++);
+        this->lcd.print("TAp: 0123:45:43:21");
+        this->lcd.setCursor(colLeft, row++);
+        this->lcd.print("TPe: 0123:45:43:21");
+        
+        row = 0;
+        this->lcd.setCursor(colRight, row++);
+        this->lcd.print("Inc:00000");
+        this->lcd.setCursor(colRight, row++);
+        this->lcd.print("Dv:00000");
     } else if (this->mode == descent) {
         this->lcd.setCursor(0, 2);
         this->lcd.print(leftArrow);
@@ -88,7 +105,6 @@ void MainDisplay::update()
         int colRight = 10;
         
         char data[6];
-
         
         memset(data, 0, 6);
         metricfy((long) round(this->telemetry->apoapsis), data);
@@ -133,6 +149,23 @@ void MainDisplay::update()
         this->lcd.setCursor(colRight+4, 3);
         padLeft(' ', this->telemetry->q, 5);
         this->lcd.print(this->telemetry->q);
+    } else if (this->mode == orbit) {
+        int colLeft = 1;
+        int colRight = 10;
+        
+        char data[6];
+        
+        memset(data, 0, 6);
+        metricfy((long) round(this->telemetry->apoapsis), data);
+        padLeft(' ', data, 5);
+        this->lcd.setCursor(colLeft+3, 0);
+        this->lcd.print(data);
+
+        memset(data, 0, 6);
+        metricfy((long) round(this->telemetry->periapsis), data);
+        padLeft(' ', data, 5);
+        this->lcd.setCursor(colLeft+3, 1);
+        this->lcd.print(data);
     }
     this->lastUpdate = millis();
     this->needsUpdate = false;

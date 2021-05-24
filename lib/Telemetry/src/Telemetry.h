@@ -38,7 +38,12 @@ class Telemetry {
         float apoapsis;
         float verticalSpeed;
         float orbitalSpeed;
+        
+        int32_t apoapsisTime;
+        int32_t periapsisTime;
+        
         int16_t pitch;
+
         char q[6] = "#";
         char twr[6] = "#";
 
