@@ -24,4 +24,8 @@ Telemetry::Telemetry() {
   this->stageWaste = 0;
 
   this->met = 0;
+
+  this->apoapsisTime = 0;
+  this->periapsisTime = 0;
+  this->timeToNextManeuver = 0;
 }

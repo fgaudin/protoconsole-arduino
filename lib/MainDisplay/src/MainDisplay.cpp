@@ -46,7 +46,7 @@ void MainDisplay::setMode(Mode mode)
         this->lcd.setCursor(colLeft, row++);
         this->lcd.print("Vs:00000");
         this->lcd.setCursor(colLeft, row++);
-        this->lcd.print("Os:00000");
+        this->lcd.print("Hs:00000");
         row = 0;
         this->lcd.setCursor(colRight, row++);
         this->lcd.print("Alt:00000");
@@ -69,7 +69,7 @@ void MainDisplay::setMode(Mode mode)
         this->lcd.setCursor(colLeft, row++);
         this->lcd.print("TAp: 0123:45:43:21");
         this->lcd.setCursor(colLeft, row++);
-        this->lcd.print("TPe: 0123:45:43:21");
+        this->lcd.print("Tmn: 0123:45:43:21");
         
         row = 0;
         this->lcd.setCursor(colRight, row++);
@@ -125,7 +125,7 @@ void MainDisplay::update()
         this->lcd.print(data);
 
         memset(data, 0, 6);
-        metricfy((long) round(this->telemetry->orbitalSpeed), data);
+        metricfy((long) round(sqrt(pow(this->telemetry->orbitalSpeed, 2) - pow(this->telemetry->verticalSpeed, 2))), data);
         padLeft(' ', data, 5);
         this->lcd.setCursor(colLeft+3, 3);
         this->lcd.print(data);
@@ -154,6 +154,7 @@ void MainDisplay::update()
         int colRight = 10;
         
         char data[6];
+        char timeData[14];
         
         memset(data, 0, 6);
         metricfy((long) round(this->telemetry->apoapsis), data);
@@ -166,6 +167,25 @@ void MainDisplay::update()
         padLeft(' ', data, 5);
         this->lcd.setCursor(colLeft+3, 1);
         this->lcd.print(data);
+
+        memset(timeData, 0, 14);
+        this->lcd.setCursor(colLeft, 2);
+        if (this->telemetry->periapsisTime > this->telemetry->apoapsisTime) {
+            this->lcd.print("TAp: ");
+            timify(this->telemetry->apoapsisTime, timeData);
+        } else {
+            this->lcd.print("TPe: ");
+            timify(this->telemetry->periapsisTime, timeData);
+        }
+        padLeft(' ', timeData, 13);
+        this->lcd.setCursor(colLeft+5, 2);
+        this->lcd.print(timeData);
+
+        memset(timeData, 0, 14);
+        timify(round(this->telemetry->timeToNextManeuver), timeData);
+        padLeft(' ', timeData, 13);
+        this->lcd.setCursor(colLeft+5, 3);
+        this->lcd.print(timeData);
     }
     this->lastUpdate = millis();
     this->needsUpdate = false;

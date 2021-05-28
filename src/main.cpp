@@ -190,6 +190,7 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
         apsidesMessage apside = parseApsides(msg);
         telemetry.apoapsis = apside.apoapsis;
         telemetry.periapsis = apside.periapsis;
+        display.refresh();
       }
     break;
     case VELOCITY_MESSAGE:
@@ -197,6 +198,7 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
         velocityMessage velocity = parseVelocity(msg);
         telemetry.verticalSpeed = velocity.vertical;
         telemetry.orbitalSpeed = velocity.orbital;
+        display.refresh();
       }
     break;
     case APSIDESTIME_MESSAGE:
@@ -204,13 +206,18 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
         apsidesTimeMessage times = parseApsidesTime(msg);
         telemetry.apoapsisTime = times.apoapsis;
         telemetry.periapsisTime = times.periapsis;
+        display.refresh();
       }
     break;
     case ORBIT_INFO:
 
     break;
     case MANEUVER_MESSAGE:
-
+      if (msgSize == sizeof(maneuverMessage)) {
+        maneuverMessage times = parseManeuver(msg);
+        telemetry.timeToNextManeuver = times.timeToNextManeuver;
+        display.refresh();
+      }
     break;
   }
 }

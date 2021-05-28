@@ -41,6 +41,7 @@ class Telemetry {
         
         int32_t apoapsisTime;
         int32_t periapsisTime;
+        float timeToNextManeuver;
         
         int16_t pitch;
 
