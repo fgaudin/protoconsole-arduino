@@ -23,6 +23,8 @@ const int pinBarData = 8;
 const int pinBarClock = 9;
 const int pinBarLoad = 10;
 
+// SoftwareSerial Serial1(pinDebugRx, pinDebugTx); // RX, TX
+
 KerbalSimpit mySimpit(Serial);
 
 Telemetry telemetry;
@@ -36,6 +38,7 @@ void messageHandler(byte messageType, byte msg[], byte msgSize);
 void setup()
 {
   Serial.begin(115200);
+  // Serial1.begin(38400);
 
   // leds
   leds.init(pinLedData, pinLedClock, pinLedLoad, &telemetry);
@@ -58,7 +61,7 @@ void setup()
   while (!mySimpit.init()) {
     delay(100);
   }
-  mySimpit.printToKSP("Connected", PRINT_TO_SCREEN);
+  mySimpit.printToKSP("Display Connected", PRINT_TO_SCREEN);
 
   mySimpit.inboundHandler(messageHandler);
   mySimpit.registerChannel(ALTITUDE_MESSAGE);
@@ -77,6 +80,7 @@ void setup()
   mySimpit.registerChannel(APSIDESTIME_MESSAGE);
   mySimpit.registerChannel(ORBIT_INFO);
   mySimpit.registerChannel(MANEUVER_MESSAGE);
+
 }
 
 void loop() {
@@ -96,6 +100,8 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
           telemetry.altitude = myAltitude.sealevel;
           display.refresh();
         }
+      } else {
+        mySimpit.printToKSP("wrong altitude message size", VERBOSE_ONLY);
       }
     break;
     case ACTIONSTATUS_MESSAGE:
