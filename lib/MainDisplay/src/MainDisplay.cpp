@@ -107,31 +107,31 @@ void MainDisplay::update()
         char data[6];
         
         memset(data, 0, 6);
-        metricfy((long) round(this->telemetry->apoapsis), data);
+        metricfy(this->telemetry->apoapsis, data);
         padLeft(' ', data, 5);
         this->lcd.setCursor(colLeft+3, 0);
         this->lcd.print(data);
 
         memset(data, 0, 6);
-        metricfy((long) round(this->telemetry->periapsis), data);
+        metricfy(this->telemetry->periapsis, data);
         padLeft(' ', data, 5);
         this->lcd.setCursor(colLeft+3, 1);
         this->lcd.print(data);
         
         memset(data, 0, 6);
-        metricfy((long) round(this->telemetry->verticalSpeed), data);
+        metricfy(this->telemetry->verticalSpeed, data);
         padLeft(' ', data, 5);
         this->lcd.setCursor(colLeft+3, 2);
         this->lcd.print(data);
 
         memset(data, 0, 6);
-        metricfy((long) round(sqrt(pow(this->telemetry->orbitalSpeed, 2) - pow(this->telemetry->verticalSpeed, 2))), data);
+        metricfy(sqrt(pow(this->telemetry->orbitalSpeed, 2) - pow(this->telemetry->verticalSpeed, 2)), data);
         padLeft(' ', data, 5);
         this->lcd.setCursor(colLeft+3, 3);
         this->lcd.print(data);
 
         memset(data, 0, 6);
-        metricfy((long) round(this->telemetry->altitude), data);
+        metricfy(this->telemetry->altitude, data);
         padLeft(' ', data, 5);
         this->lcd.setCursor(colRight+4, 0);
         this->lcd.print(data);

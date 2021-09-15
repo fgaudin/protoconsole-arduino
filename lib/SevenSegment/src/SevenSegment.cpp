@@ -30,7 +30,7 @@ void SevenSegment::test() {
     this->ledCtrl.clearDisplay(0);
 }
 
-void SevenSegment::_printMET(unsigned long value) {
+void SevenSegment::_printMET(uint32_t value) {
     uint8_t seconds = (uint8_t) (value % 60);
     uint8_t minutes = (uint8_t)(value / 60 % 60);
     uint16_t hours = (uint16_t) (value / 3600);

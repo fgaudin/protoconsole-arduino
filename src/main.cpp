@@ -9,7 +9,7 @@
 #include <Utils.h>
 
 #define DEBUG 1
-#define TEST 0
+#define TEST 1
 
 const int pinDebugRx = 6;
 const int pinDebugTx = 7;
@@ -57,6 +57,10 @@ void setup()
   bars.init(pinBarData, pinBarClock, pinBarLoad, &telemetry);
   bars.setMode(fuel);
 
+  #if TEST
+  return;
+  #endif
+
   // simpit
   while (!mySimpit.init()) {
     delay(100);
@@ -83,8 +87,122 @@ void setup()
 
 }
 
+int test_step = 18;
+int test_delay = 800;
+
+void test_mode() {
+  delay(test_delay);
+  switch(test_step) {
+    case 0:
+      display.setMode(debug);
+      strcpy(display.debug_str, "testing mode");
+    break;
+    case 1:
+      telemetry.lights = true;
+      strcpy(display.debug_str, "lights on");
+    break;
+    case 2:
+      telemetry.docked = true;
+      strcpy(display.debug_str, "docked on");
+    break;
+    case 3:
+      telemetry.rcs = true;
+      strcpy(display.debug_str, "rcs on");
+    break;
+    case 4:
+      telemetry.sas = true;
+      strcpy(display.debug_str, "sas on");
+    break;
+    case 5:
+      telemetry.antenna = 1;
+      strcpy(display.debug_str, "antenna 1");
+    break;
+    case 6:
+      telemetry.antenna = 2;
+      strcpy(display.debug_str, "antenna 2");
+    break;
+    case 7:
+      telemetry.antenna = 3;
+      strcpy(display.debug_str, "antenna 3");
+    break;
+    case 8:
+      telemetry.contact = true;
+      strcpy(display.debug_str, "contact on");
+    break;
+    case 9:
+      telemetry.dot05g = true;
+      strcpy(display.debug_str, ".05g on");
+    break;
+    case 10:
+      telemetry.dot05g = true;
+      strcpy(display.debug_str, ".05g on");
+    break;
+    case 11:
+      telemetry.master_alarm = true;
+      strcpy(display.debug_str, "master alarm on");
+    break;
+    case 12:
+      telemetry.solarPanel = true;
+      strcpy(display.debug_str, "solar on");
+    break;
+    case 13:
+      telemetry.gear = true;
+      strcpy(display.debug_str, "gear on");
+    break;
+    case 14:
+      telemetry.brake = true;
+      strcpy(display.debug_str, "break on");
+    break;
+    case 15:
+      telemetry.stage = true;
+      strcpy(display.debug_str, "stage on");
+    break;
+    case 16:
+      telemetry.stageFuel++;
+      telemetry.stageOx++;
+      telemetry.stageMonoprop++;
+      telemetry.stageElec++;
+      telemetry.stageXenon++;
+      strcpy(display.debug_str, "testing led bars");
+      if(telemetry.stageFuel < 10) {
+        test_step--;
+      }
+      test_delay = 200;
+    break;
+    case 17:
+      if (telemetry.met < 5*4000271) telemetry.met += 4000271;  // 3600 * 1111 + 60 * 11 + 11
+      else telemetry.met += 3999600;  // 3600*1111
+      strcpy(display.debug_str, "testing 7 segments");
+      test_delay = 500;
+      if (telemetry.met <= 36002439) test_step--;
+      else telemetry.met = 0;
+    break;
+    case 18:
+      test_delay = 300;
+      if (telemetry.apoapsis == 0) display.setMode(ascent);
+      telemetry.apoapsis = 2 * (1 + telemetry.apoapsis);
+      telemetry.periapsis = 2 * (1 + telemetry.periapsis);
+      telemetry.verticalSpeed = 2 * (1 + telemetry.verticalSpeed);
+      telemetry.orbitalSpeed = 2 * (1 + telemetry.verticalSpeed);
+      telemetry.altitude = 2 * (1 + telemetry.altitude);
+      telemetry.pitch = (telemetry.pitch + 9) % 360;
+      if (telemetry.apoapsis < pow(10, 16)) test_step--;
+    break;
+    default:
+      test_step = 0;
+    break;
+  }
+
+  display.refresh();
+  test_step++;
+}
+
 void loop() {
+  #if TEST == 0
   mySimpit.update();
+  #else
+  test_mode();
+  #endif
   leds.refresh();
   display.update();
   seg7.refresh();

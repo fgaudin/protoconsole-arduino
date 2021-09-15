@@ -24,19 +24,25 @@ void padLeft(char padChar, char * str, int max)
     }
 }
 
-void metricfy(long value, char * buffer)
+void metricfy(float value, char * buffer)
 {
     char unit = ' ';
     double formatted = value;
     unsigned char width = 1;
     unsigned char precision = 0;
 
-    if (abs(value) >= 1000000000) {
+    if (abs(value) >= pow(10, 15)) {
+        strcpy(buffer, "EEEEE");
+        return;
+    } else if (abs(value) >= pow(10, 12)) {
+        unit = 'T';
+        formatted = (double) value / pow(10, 12);
+    } else if (abs(value) >= pow(10, 9)) {
         unit = 'G';
-        formatted = (double) value / 1000000000;
-    } else if (abs(value) >= 1000000) {
+        formatted = (double) value / pow(10, 9);
+    } else if (abs(value) >= pow(10, 6)) {
         unit = 'M';
-        formatted = (double) value / 1000000;
+        formatted = (double) value / pow(10, 6);
     } else if (value >= 10000 || value <= -1000) {
         unit = 'k';
         formatted = (double) value / 1000;

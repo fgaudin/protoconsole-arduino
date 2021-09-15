@@ -31,7 +31,7 @@ class Telemetry {
         int stageCO2;
         int stageWaste;
 
-        unsigned long met;
+        uint32_t met;
 
         float altitude;
         float periapsis;
