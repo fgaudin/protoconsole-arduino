@@ -48,5 +48,8 @@ class Telemetry {
         char q[6] = "#";
         char twr[6] = "#";
 
+        float inclination;
+        float deltav;
+
         Telemetry();
 };

@@ -74,7 +74,7 @@ void MainDisplay::setMode(Mode mode)
         row = 0;
         this->lcd.setCursor(colRight, row++);
         this->lcd.print("Inc:00000");
-        this->lcd.setCursor(colRight, row++);
+        this->lcd.setCursor(colRight+1, row++);
         this->lcd.print("Dv:00000");
     } else if (this->mode == descent) {
         this->lcd.setCursor(0, 2);
@@ -157,13 +157,13 @@ void MainDisplay::update()
         char timeData[14];
         
         memset(data, 0, 6);
-        metricfy((long) round(this->telemetry->apoapsis), data);
+        metricfy(this->telemetry->apoapsis, data);
         padLeft(' ', data, 5);
         this->lcd.setCursor(colLeft+3, 0);
         this->lcd.print(data);
 
         memset(data, 0, 6);
-        metricfy((long) round(this->telemetry->periapsis), data);
+        metricfy(this->telemetry->periapsis, data);
         padLeft(' ', data, 5);
         this->lcd.setCursor(colLeft+3, 1);
         this->lcd.print(data);
@@ -186,6 +186,18 @@ void MainDisplay::update()
         padLeft(' ', timeData, 13);
         this->lcd.setCursor(colLeft+5, 3);
         this->lcd.print(timeData);
+
+        memset(data, 0, 6);
+        itoa((int)round(this->telemetry->inclination), data, 10);
+        padLeft(' ', data, 5);
+        this->lcd.setCursor(colRight+4, 0);
+        this->lcd.print(data);
+
+        memset(data, 0, 6);
+        metricfy(this->telemetry->deltav, data);
+        padLeft(' ', data, 5);
+        this->lcd.setCursor(colRight+4, 1);
+        this->lcd.print(data);
     }
     this->lastUpdate = millis();
     this->needsUpdate = false;

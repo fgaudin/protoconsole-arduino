@@ -9,7 +9,10 @@
 #include <Utils.h>
 
 #define DEBUG 1
-#define TEST 1
+#define TEST 0
+
+const int pinLSMode = 4;
+const int pinFuelMode = 5;
 
 const int pinDebugRx = 6;
 const int pinDebugTx = 7;
@@ -84,10 +87,10 @@ void setup()
   mySimpit.registerChannel(APSIDESTIME_MESSAGE);
   mySimpit.registerChannel(ORBIT_INFO);
   mySimpit.registerChannel(MANEUVER_MESSAGE);
-
+  mySimpit.registerChannel(DELTAV_MESSAGE);
 }
 
-int test_step = 18;
+int test_step = 19;
 int test_delay = 800;
 
 void test_mode() {
@@ -188,6 +191,22 @@ void test_mode() {
       telemetry.pitch = (telemetry.pitch + 9) % 360;
       if (telemetry.apoapsis < pow(10, 16)) test_step--;
     break;
+    case 19:
+      test_delay = 300;
+      if (telemetry.timeToNextManeuver == 0) {
+        display.setMode(orbit);
+        telemetry.apoapsis = 0;
+        telemetry.periapsis = 0;
+      }
+      telemetry.apoapsis = 2 * (1 + telemetry.apoapsis);
+      telemetry.periapsis = 2 * (1 + telemetry.periapsis);
+      telemetry.apoapsisTime += 59.0;
+      telemetry.periapsisTime += 59.0;
+      telemetry.timeToNextManeuver += 59.0;
+      telemetry.inclination += 1;
+      telemetry.deltav += 111;
+      if (telemetry.timeToNextManeuver < pow(10, 16)) test_step--;
+    break;
     default:
       test_step = 0;
     break;
@@ -206,6 +225,12 @@ void loop() {
   leds.refresh();
   display.update();
   seg7.refresh();
+
+  if (digitalRead(pinLSMode)) {
+    bars.setMode(lifesupport);
+  } else {
+    bars.setMode(fuel);
+  }
   bars.refresh();
 }
 
@@ -280,11 +305,6 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
         cagStatusMessage status = parseCAGStatusMessage(msg);
         telemetry.solarPanel = status.is_action_activated(1);
         telemetry.stage = status.is_action_activated(242);
-        if (status.is_action_activated(243)) {
-          bars.setMode(lifesupport);
-        } else {
-          bars.setMode(fuel);
-        }
 
         int mode = 0;
         if (status.is_action_activated(240)) {
@@ -334,12 +354,23 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
       }
     break;
     case ORBIT_INFO:
-
+       if (msgSize == sizeof(orbitInfoMessage)) {
+        orbitInfoMessage orbitInfo = parseOrbitInfo(msg);
+        telemetry.inclination = orbitInfo.inclination;
+        display.refresh();
+      }
     break;
     case MANEUVER_MESSAGE:
       if (msgSize == sizeof(maneuverMessage)) {
         maneuverMessage times = parseManeuver(msg);
         telemetry.timeToNextManeuver = times.timeToNextManeuver;
+        display.refresh();
+      }
+    break;
+    case DELTAV_MESSAGE:
+       if (msgSize == sizeof(deltaVMessage)) {
+        deltaVMessage dv = parseDeltaV(msg);
+        telemetry.deltav = dv.stageDeltaV;
         display.refresh();
       }
     break;

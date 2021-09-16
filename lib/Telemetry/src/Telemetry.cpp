@@ -28,4 +28,6 @@ Telemetry::Telemetry() {
   this->apoapsisTime = 0;
   this->periapsisTime = 0;
   this->timeToNextManeuver = 0;
+  this->inclination = 0;
+  this->deltav = 0;
 }
